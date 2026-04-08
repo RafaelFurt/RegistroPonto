@@ -8,6 +8,8 @@
     <title>Registro de Ponto • Paleta #620000</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Biblioteca para exportar PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -245,7 +247,7 @@
             border-radius: 40px;
             font-weight: 600;
             flex: 1;
-            min-width: 100px;
+            min-width: 80px;
             cursor: pointer;
             transition: 0.15s;
             display: flex;
@@ -280,6 +282,8 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .relatorio-header h3 {
             color: #620000;
@@ -288,6 +292,25 @@
             align-items: center;
             gap: 8px;
         }
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-export {
+            background: #620000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 40px;
+        }
+        .btn-export:active { background: #4a0000; }
 
         .filtros-relatorio {
             display: flex;
@@ -328,7 +351,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Tabela de Relatório */
         .tabela-relatorio {
             width: 100%;
             border-collapse: collapse;
@@ -452,23 +474,21 @@
     <div class="relatorio-section" id="relatorioSection" style="display: none;">
         <div class="relatorio-header">
             <h3><i class="fas fa-history"></i> Histórico de Pontos</h3>
-            <button class="btn-secundario" id="btnFecharRelatorio" style="padding: 8px 12px;">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="export-buttons">
+                <button class="btn-export" id="btnExportExcel" title="Exportar para Excel"><i class="fas fa-file-excel"></i> Excel</button>
+                <button class="btn-export" id="btnExportPNG" title="Exportar como Imagem"><i class="fas fa-image"></i> PNG</button>
+                <button class="btn-secundario" id="btnFecharRelatorio" style="padding: 8px 12px;"><i class="fas fa-times"></i></button>
+            </div>
         </div>
         
         <div class="filtros-relatorio">
             <input type="date" id="filtroDataInicio" class="filtro-data" value="">
             <input type="date" id="filtroDataFim" class="filtro-data" value="">
-            <button class="btn-relatorio" id="btnBuscarRelatorio">
-                <i class="fas fa-search"></i> Buscar
-            </button>
+            <button class="btn-relatorio" id="btnBuscarRelatorio"><i class="fas fa-search"></i> Buscar</button>
         </div>
 
         <div class="resultado-relatorio" id="resultadoRelatorio">
-            <div class="sem-registros">
-                <i class="fas fa-calendar-times"></i> Selecione as datas e clique em Buscar
-            </div>
+            <div class="sem-registros"><i class="fas fa-calendar-times"></i> Selecione as datas e clique em Buscar</div>
         </div>
     </div>
 
@@ -481,7 +501,7 @@
     (function(){
         "use strict";
 
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl1nJuyxmsS3p21G57S7TVbXapp-1jrbTpoKy8bvPyNdgbPs5RY7pCfOtEXKe2TOM/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyvzwvTjZho_upy9Zy0o8KQVwN-mICdOl6ivuBtXrr3cNT1dEEJrH2PaI2SwzopTRmS/exec';
 
         let colaboradores = [];
         let colaboradorSelecionado = null;
@@ -504,6 +524,8 @@
         const btnToggleRelatorio = document.getElementById('btnToggleRelatorio');
         const btnFecharRelatorio = document.getElementById('btnFecharRelatorio');
         const btnBuscarRelatorio = document.getElementById('btnBuscarRelatorio');
+        const btnExportExcel = document.getElementById('btnExportExcel');
+        const btnExportPNG = document.getElementById('btnExportPNG');
         const statusText = document.getElementById('statusText');
         const listaColabsDiv = document.getElementById('listaColabs');
         const relatorioSection = document.getElementById('relatorioSection');
@@ -523,6 +545,8 @@
             document.getElementById('card1'), document.getElementById('card2'), 
             document.getElementById('card3'), document.getElementById('card4')
         ];
+
+        let dadosTabelaAtual = [];
 
         function atualizarDataAtual() {
             const agora = new Date();
@@ -628,27 +652,27 @@
             const dataHoje = new Date();
             const dataFormatada = dataHoje.toLocaleDateString('pt-BR');
 
-            const formData = new URLSearchParams();
-            formData.append('acao', acao);
-            formData.append('colaborador', colaboradorSelecionado);
-            formData.append('data', dataFormatada);
-            formData.append('marcacao1', marcacoes[0].hora || '');
-            formData.append('local1', marcacoes[0].local || '');
-            formData.append('marcacao2', marcacoes[1].hora || '');
-            formData.append('local2', marcacoes[1].local || '');
-            formData.append('marcacao3', marcacoes[2].hora || '');
-            formData.append('local3', marcacoes[2].local || '');
-            formData.append('marcacao4', marcacoes[3].hora || '');
-            formData.append('local4', marcacoes[3].local || '');
-            formData.append('tipo_marcacao', (proximoIndice).toString());
-            formData.append('iso_timestamp', dataHoje.toISOString());
+            const params = new URLSearchParams();
+            params.append('acao', acao);
+            params.append('colaborador', colaboradorSelecionado);
+            params.append('data', dataFormatada);
+            params.append('marcacao1', marcacoes[0].hora || '');
+            params.append('local1', marcacoes[0].local || '');
+            params.append('marcacao2', marcacoes[1].hora || '');
+            params.append('local2', marcacoes[1].local || '');
+            params.append('marcacao3', marcacoes[2].hora || '');
+            params.append('local3', marcacoes[2].local || '');
+            params.append('marcacao4', marcacoes[3].hora || '');
+            params.append('local4', marcacoes[3].local || '');
+            params.append('tipo_marcacao', proximoIndice.toString());
+            params.append('iso_timestamp', dataHoje.toISOString());
 
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData.toString()
+                    body: params.toString()
                 });
                 
                 if (acao === 'registrar') {
@@ -797,6 +821,7 @@
 
             if (registrosFiltrados.length === 0) {
                 resultadoRelatorio.innerHTML = '<div class="sem-registros">Nenhum registro encontrado</div>';
+                dadosTabelaAtual = [];
                 return;
             }
 
@@ -815,36 +840,69 @@
                 }
             });
 
+            dadosTabelaAtual = Object.values(agrupado).sort((a, b) => b.data.localeCompare(a.data));
+            
             let html = `
-                <table class="tabela-relatorio">
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Colaborador</th>
-                            <th>1ª</th>
-                            <th>2ª</th>
-                            <th>3ª</th>
-                            <th>4ª</th>
-                        </tr>
-                    </thead>
+                <table class="tabela-relatorio" id="tabelaExport">
+                    <thead><tr><th>Data</th><th>Colaborador</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead>
                     <tbody>
             `;
             
-            Object.values(agrupado).sort((a, b) => b.data.localeCompare(a.data)).forEach(reg => {
-                html += `
-                    <tr>
-                        <td>${reg.data}</td>
-                        <td class="colab-nome">${reg.colaborador}</td>
-                        <td class="hora-cell">${reg.m1}</td>
-                        <td class="hora-cell">${reg.m2}</td>
-                        <td class="hora-cell">${reg.m3}</td>
-                        <td class="hora-cell">${reg.m4}</td>
-                    </tr>
-                `;
+            dadosTabelaAtual.forEach(reg => {
+                html += `<tr><td>${reg.data}</td><td class="colab-nome">${reg.colaborador}</td><td class="hora-cell">${reg.m1}</td><td class="hora-cell">${reg.m2}</td><td class="hora-cell">${reg.m3}</td><td class="hora-cell">${reg.m4}</td></tr>`;
             });
             
             html += '</tbody></table>';
             resultadoRelatorio.innerHTML = html;
+        }
+
+        function exportarExcel() {
+            if (dadosTabelaAtual.length === 0) {
+                alert('Nenhum dado para exportar!');
+                return;
+            }
+            
+            let csv = 'Data,Colaborador,1ª Marcação,2ª Marcação,3ª Marcação,4ª Marcação\n';
+            dadosTabelaAtual.forEach(reg => {
+                csv += `"${reg.data}","${reg.colaborador}","${reg.m1}","${reg.m2}","${reg.m3}","${reg.m4}"\n`;
+            });
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `ponto_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+            
+            statusText.textContent = '✅ Relatório exportado para Excel!';
+        }
+
+        async function exportarPNG() {
+            const tabela = document.querySelector('.tabela-relatorio');
+            if (!tabela) {
+                alert('Nenhuma tabela para exportar!');
+                return;
+            }
+            
+            statusText.textContent = '📸 Gerando imagem...';
+            
+            try {
+                const canvas = await html2canvas(tabela, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    allowTaint: false,
+                    useCORS: true
+                });
+                
+                const link = document.createElement('a');
+                link.download = `ponto_${new Date().toISOString().slice(0,10)}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                statusText.textContent = '✅ Imagem exportada com sucesso!';
+            } catch (err) {
+                console.error('Erro ao exportar PNG:', err);
+                statusText.textContent = '❌ Erro ao gerar imagem';
+            }
         }
 
         function toggleRelatorio() {
@@ -930,6 +988,8 @@
                 btnToggleRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatório';
             });
             btnBuscarRelatorio.addEventListener('click', buscarRelatorio);
+            btnExportExcel.addEventListener('click', exportarExcel);
+            btnExportPNG.addEventListener('click', exportarPNG);
             window.addEventListener('beforeunload', () => salvarEstadoAtualNoStorage());
         }
 
