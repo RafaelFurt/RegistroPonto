@@ -6,7 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Registro de Ponto • Paleta #620000</title>
-    <!-- Google Fonts & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -41,20 +40,8 @@
         }
 
         @media (max-width: 480px) {
-            body {
-                padding: 8px;
-            }
-            
-            .app-container {
-                border-radius: 24px;
-                padding: 16px 12px 24px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .app-container {
-                padding: 14px 10px 20px;
-            }
+            body { padding: 8px; }
+            .app-container { border-radius: 24px; padding: 16px 12px 24px; }
         }
 
         .app-header {
@@ -66,21 +53,14 @@
             padding-bottom: 14px;
         }
 
-        .app-header i {
-            font-size: 28px;
-            color: #620000;
-        }
-
+        .app-header i { font-size: 28px; color: #620000; }
         .app-header h1 {
             font-weight: 600;
             font-size: clamp(1.5rem, 8vw, 1.9rem);
             letter-spacing: -0.5px;
             color: #2c0e0e;
         }
-
-        .app-header h1 span {
-            color: #620000;
-        }
+        .app-header h1 span { color: #620000; }
 
         .data-atual {
             background: #f9f3ef;
@@ -99,11 +79,7 @@
             font-weight: 600;
             font-size: clamp(1rem, 4.5vw, 1.2rem);
         }
-
-        .data-texto i {
-            color: #620000;
-            margin-right: 6px;
-        }
+        .data-texto i { color: #620000; margin-right: 6px; }
 
         #diaSemana {
             background: #62000010;
@@ -112,10 +88,7 @@
             font-size: clamp(0.8rem, 3.5vw, 0.9rem);
         }
 
-        .colaborador-section {
-            margin-bottom: 20px;
-        }
-
+        .colaborador-section { margin-bottom: 20px; }
         .label-icon {
             font-weight: 500;
             margin-bottom: 8px;
@@ -125,10 +98,7 @@
             gap: 8px;
             font-size: clamp(0.9rem, 4vw, 1rem);
         }
-
-        .label-icon i {
-            color: #620000;
-        }
+        .label-icon i { color: #620000; }
 
         .seletor-colaborador {
             display: flex;
@@ -152,7 +122,7 @@
         }
 
         select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23620000' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23620000' d='M6 9L1 4h10z'/%3E%3Csvg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
             background-size: 12px;
@@ -181,29 +151,13 @@
             white-space: nowrap;
             min-height: 48px;
         }
-
-        .btn-cadastrar:active {
-            background: #4a0000;
-            transform: scale(0.97);
-        }
-
-        @media (hover: hover) {
-            .btn-cadastrar:hover {
-                background: #4a0000;
-            }
-        }
+        .btn-cadastrar:active { background: #4a0000; transform: scale(0.97); }
 
         .marcacoes-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin: 18px 0 20px;
-        }
-
-        @media (max-width: 400px) {
-            .marcacoes-grid {
-                gap: 10px;
-            }
         }
 
         .card-marcacao {
@@ -214,7 +168,6 @@
             box-shadow: 0 4px 8px rgba(98, 0, 0, 0.02);
             transition: 0.1s;
         }
-
         .card-marcacao.preenchido {
             background: #f1e8e4;
             border-left: 6px solid #620000;
@@ -230,12 +183,7 @@
             display: flex;
             justify-content: space-between;
         }
-
-        .titulo-marcacao i {
-            color: #620000;
-            opacity: 0.7;
-            font-size: clamp(0.8rem, 3.5vw, 0.9rem);
-        }
+        .titulo-marcacao i { color: #620000; opacity: 0.7; }
 
         .hora-marcacao {
             font-size: clamp(1.3rem, 6vw, 1.7rem);
@@ -273,70 +221,41 @@
             margin: 8px 0 16px;
             border: 1px solid #4a0000;
             min-height: 60px;
-            -webkit-touch-callout: none;
         }
-
-        .btn-ponto i {
-            font-size: clamp(1.3rem, 6vw, 1.5rem);
-        }
-
-        .btn-ponto:active {
-            background: #4a0000;
-            transform: scale(0.98);
-            box-shadow: 0 4px 10px rgba(98, 0, 0, 0.3);
-        }
-
-        @media (hover: hover) {
-            .btn-ponto:hover {
-                background: #4a0000;
-                transform: scale(0.99);
-                box-shadow: 0 4px 10px rgba(98, 0, 0, 0.3);
-            }
-        }
-
+        .btn-ponto:active { background: #4a0000; transform: scale(0.98); }
         .btn-ponto:disabled {
             background: #b9a7a7;
             box-shadow: none;
             border-color: #9e8b8b;
             cursor: not-allowed;
             opacity: 0.6;
-            transform: none;
         }
 
         .acoes-secundarias {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-top: 8px;
+            flex-wrap: wrap;
         }
-
         .btn-secundario {
             background: transparent;
             border: 1.5px solid #620000;
             color: #620000;
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-radius: 40px;
             font-weight: 600;
             flex: 1;
+            min-width: 100px;
             cursor: pointer;
             transition: 0.15s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            font-size: clamp(0.85rem, 3.8vw, 0.95rem);
-            min-height: 48px;
-            -webkit-touch-callout: none;
+            font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+            min-height: 44px;
         }
-
-        .btn-secundario:active {
-            background: #fff0ec;
-        }
-
-        @media (hover: hover) {
-            .btn-secundario:hover {
-                background: #fff0ec;
-            }
-        }
+        .btn-secundario:active { background: #fff0ec; }
 
         .status-msg {
             margin-top: 16px;
@@ -356,14 +275,12 @@
             padding-top: 18px;
             border-top: 2px dashed #d9c7c0;
         }
-
         .relatorio-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 14px;
         }
-
         .relatorio-header h3 {
             color: #620000;
             font-size: clamp(1.1rem, 5vw, 1.2rem);
@@ -378,7 +295,6 @@
             margin-bottom: 14px;
             flex-wrap: wrap;
         }
-
         .filtro-data {
             flex: 1;
             min-width: 120px;
@@ -387,7 +303,6 @@
             border: 1.5px solid #d9c7c0;
             font-size: clamp(0.85rem, 3.8vw, 0.9rem);
         }
-
         .btn-relatorio {
             background: #620000;
             color: white;
@@ -401,15 +316,10 @@
             gap: 6px;
             font-size: clamp(0.85rem, 3.8vw, 0.9rem);
             min-height: 48px;
-            white-space: nowrap;
-        }
-
-        .btn-relatorio:active {
-            background: #4a0000;
         }
 
         .resultado-relatorio {
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
             background: #fcf9f7;
             border-radius: 16px;
@@ -418,44 +328,44 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .registro-item {
+        /* Tabela de Relatório */
+        .tabela-relatorio {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: clamp(0.7rem, 3.2vw, 0.8rem);
             background: white;
             border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            border-left: 4px solid #620000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
-
-        .registro-header {
-            display: flex;
-            justify-content: space-between;
+        .tabela-relatorio th {
+            background: #620000;
+            color: white;
+            padding: 10px 4px;
             font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .tabela-relatorio td {
+            padding: 8px 4px;
+            text-align: center;
+            border-bottom: 1px solid #e5d8d2;
+        }
+        .tabela-relatorio tr:last-child td { border-bottom: none; }
+        .tabela-relatorio .colab-nome {
+            text-align: left;
+            padding-left: 8px;
+            font-weight: 500;
             color: #620000;
-            margin-bottom: 8px;
-            font-size: clamp(0.85rem, 3.8vw, 0.95rem);
-            flex-wrap: wrap;
-            gap: 6px;
         }
-
-        .registro-horarios {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            font-size: clamp(0.75rem, 3.5vw, 0.85rem);
-        }
-
-        .horario-item {
-            display: flex;
-            justify-content: space-between;
-            gap: 6px;
+        .tabela-relatorio .hora-cell {
+            font-family: monospace;
+            font-weight: 600;
         }
 
         .sem-registros {
             text-align: center;
             padding: 20px;
             color: #6b4e4e;
-            font-size: clamp(0.85rem, 3.8vw, 0.95rem);
         }
 
         .footer-note {
@@ -464,32 +374,16 @@
             color: #6f5555;
             text-align: center;
         }
-
         .lista-colab {
             font-size: clamp(0.75rem, 3.2vw, 0.8rem);
             margin-top: 6px;
             color: #4a2a2a;
         }
 
-        /* Melhorias para touch */
-        button, select, input {
-            touch-action: manipulation;
-        }
-
-        /* Scrollbar personalizada */
-        .resultado-relatorio::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .resultado-relatorio::-webkit-scrollbar-track {
-            background: #f1e8e4;
-            border-radius: 10px;
-        }
-
-        .resultado-relatorio::-webkit-scrollbar-thumb {
-            background: #620000;
-            border-radius: 10px;
-        }
+        button, select, input { touch-action: manipulation; }
+        .resultado-relatorio::-webkit-scrollbar { width: 6px; }
+        .resultado-relatorio::-webkit-scrollbar-track { background: #f1e8e4; border-radius: 10px; }
+        .resultado-relatorio::-webkit-scrollbar-thumb { background: #620000; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -509,7 +403,7 @@
         <div class="label-icon"><i class="fas fa-user-check"></i> Colaborador atual</div>
         <div class="seletor-colaborador">
             <select id="selectColaborador" aria-label="Selecione o colaborador"></select>
-            <button class="btn-cadastrar" id="btnCadastrarNovo" title="Cadastrar novo colaborador"><i class="fas fa-plus-circle"></i> Novo</button>
+            <button class="btn-cadastrar" id="btnCadastrarNovo"><i class="fas fa-plus-circle"></i> Novo</button>
         </div>
         <div id="listaColabs" class="lista-colab"></div>
     </div>
@@ -546,7 +440,8 @@
     </button>
 
     <div class="acoes-secundarias">
-        <button class="btn-secundario" id="btnResetarDia"><i class="fas fa-undo-alt"></i> Resetar dia</button>
+        <button class="btn-secundario" id="btnResetarDia"><i class="fas fa-undo-alt"></i> Resetar</button>
+        <button class="btn-secundario" id="btnGerenciarColabs"><i class="fas fa-users-cog"></i> Gerenciar</button>
         <button class="btn-secundario" id="btnToggleRelatorio"><i class="fas fa-chart-bar"></i> Relatório</button>
     </div>
 
@@ -586,7 +481,7 @@
     (function(){
         "use strict";
 
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQNl1bpZHoGfci2tyfsL3PHVxStfccyIle43xlYXF2kTfhtN4zw7q3C97xLY0LAxHt/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl1nJuyxmsS3p21G57S7TVbXapp-1jrbTpoKy8bvPyNdgbPs5RY7pCfOtEXKe2TOM/exec';
 
         let colaboradores = [];
         let colaboradorSelecionado = null;
@@ -605,6 +500,7 @@
         const btnCadastrar = document.getElementById('btnCadastrarNovo');
         const btnMarcar = document.getElementById('btnMarcarPonto');
         const btnReset = document.getElementById('btnResetarDia');
+        const btnGerenciarColabs = document.getElementById('btnGerenciarColabs');
         const btnToggleRelatorio = document.getElementById('btnToggleRelatorio');
         const btnFecharRelatorio = document.getElementById('btnFecharRelatorio');
         const btnBuscarRelatorio = document.getElementById('btnBuscarRelatorio');
@@ -630,8 +526,7 @@
 
         function atualizarDataAtual() {
             const agora = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            dataSpan.textContent = agora.toLocaleDateString('pt-BR', options);
+            dataSpan.textContent = agora.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
             diaSemanaSpan.textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long' });
             
             const hoje = new Date().toISOString().split('T')[0];
@@ -718,33 +613,23 @@
 
         function obterLocalizacao() {
             return new Promise((resolve) => {
-                if (!navigator.geolocation) {
-                    return resolve('Geolocalização não suportada');
-                }
+                if (!navigator.geolocation) return resolve('Geolocalização não suportada');
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        const lat = pos.coords.latitude.toFixed(5);
-                        const lng = pos.coords.longitude.toFixed(5);
-                        resolve(`Lat ${lat}, Lng ${lng}`);
-                    },
-                    (err) => {
-                        let msg = 'Localização indisponível';
-                        if (err.code === 1) msg = 'Permissão negada';
-                        else if (err.code === 2) msg = 'Posição indisponível';
-                        resolve(`📍 ${msg}`);
-                    },
+                    (pos) => resolve(`Lat ${pos.coords.latitude.toFixed(5)}, Lng ${pos.coords.longitude.toFixed(5)}`),
+                    (err) => resolve(`📍 ${err.code === 1 ? 'Permissão negada' : 'Posição indisponível'}`),
                     { enableHighAccuracy: false, timeout: 6000, maximumAge: 30000 }
                 );
             });
         }
 
-        async function salvarNoGoogleSheet() {
+        async function salvarNoGoogleSheet(acao = 'registrar') {
             if (!colaboradorSelecionado) return false;
 
             const dataHoje = new Date();
             const dataFormatada = dataHoje.toLocaleDateString('pt-BR');
 
             const formData = new URLSearchParams();
+            formData.append('acao', acao);
             formData.append('colaborador', colaboradorSelecionado);
             formData.append('data', dataFormatada);
             formData.append('marcacao1', marcacoes[0].hora || '');
@@ -766,30 +651,20 @@
                     body: formData.toString()
                 });
                 
-                salvarRegistroLocal({
-                    colaborador: colaboradorSelecionado,
-                    data: dataFormatada,
-                    marcacao1: marcacoes[0].hora || '',
-                    marcacao2: marcacoes[1].hora || '',
-                    marcacao3: marcacoes[2].hora || '',
-                    marcacao4: marcacoes[3].hora || '',
-                    timestamp: dataHoje.toISOString()
-                });
-                
-                console.log('✅ Dados enviados para Google Sheets');
+                if (acao === 'registrar') {
+                    salvarRegistroLocal({
+                        colaborador: colaboradorSelecionado,
+                        data: dataFormatada,
+                        marcacao1: marcacoes[0].hora || '',
+                        marcacao2: marcacoes[1].hora || '',
+                        marcacao3: marcacoes[2].hora || '',
+                        marcacao4: marcacoes[3].hora || '',
+                        timestamp: dataHoje.toISOString()
+                    });
+                }
                 return true;
             } catch (err) {
-                console.error('❌ Erro ao enviar:', err);
-                salvarRegistroLocal({
-                    colaborador: colaboradorSelecionado,
-                    data: dataFormatada,
-                    marcacao1: marcacoes[0].hora || '',
-                    marcacao2: marcacoes[1].hora || '',
-                    marcacao3: marcacoes[2].hora || '',
-                    marcacao4: marcacoes[3].hora || '',
-                    timestamp: dataHoje.toISOString(),
-                    erro: err.toString()
-                });
+                console.error('Erro:', err);
                 return false;
             }
         }
@@ -801,60 +676,97 @@
         }
 
         async function registrarPonto() {
-            if (!colaboradorSelecionado) {
-                alert('Selecione um colaborador.');
-                return;
-            }
-            if (proximoIndice >= 4) {
-                alert('Todas as marcações já foram feitas.');
-                return;
-            }
+            if (!colaboradorSelecionado) { alert('Selecione um colaborador.'); return; }
+            if (proximoIndice >= 4) { alert('Todas as marcações já foram feitas.'); return; }
 
             btnMarcar.disabled = true;
-            statusText.textContent = 'Obtendo localização e horário...';
+            statusText.textContent = 'Obtendo localização...';
 
             try {
                 const agora = new Date();
                 const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 const local = await obterLocalizacao();
-                const isoString = agora.toISOString();
 
-                marcacoes[proximoIndice] = { hora: horaFormatada, local: local, iso: isoString };
+                marcacoes[proximoIndice] = { hora: horaFormatada, local: local, iso: agora.toISOString() };
 
-                statusText.textContent = 'Salvando no Google Sheets...';
-                await salvarNoGoogleSheet();
+                statusText.textContent = 'Salvando...';
+                await salvarNoGoogleSheet('registrar');
 
                 atualizarCardsMarcacoes();
                 proximoIndice++;
                 
                 const etapas = ['1ª (início)', '2ª (saída almoço)', '3ª (retorno)', '4ª (fim)'];
-                if (proximoIndice < 4) {
-                    statusText.textContent = `✅ ${etapas[proximoIndice-1]} registrada e salva! Próximo: ${proximoIndice+1}ª.`;
-                } else {
-                    statusText.textContent = '🎉 Expediente completo! Todos os pontos salvos.';
-                }
+                statusText.textContent = proximoIndice < 4 
+                    ? `✅ ${etapas[proximoIndice-1]} registrada! Próximo: ${proximoIndice+1}ª.`
+                    : '🎉 Expediente completo!';
                 
                 salvarEstadoAtualNoStorage();
             } catch (error) {
-                statusText.textContent = 'Erro ao registrar. Tente novamente.';
-                console.error(error);
+                statusText.textContent = 'Erro ao registrar.';
             } finally {
                 atualizarStatusBotao();
             }
         }
 
-        function resetarDia() {
-            if (confirm('Apagar todas as marcações do dia atual?')) {
-                marcacoes = [
-                    { hora: null, local: null, iso: null },
-                    { hora: null, local: null, iso: null },
-                    { hora: null, local: null, iso: null },
-                    { hora: null, local: null, iso: null }
-                ];
-                proximoIndice = 0;
-                atualizarCardsMarcacoes();
-                salvarEstadoAtualNoStorage();
-                statusText.textContent = 'Marcações resetadas. Novo dia!';
+        async function resetarDia() {
+            if (!confirm('⚠️ Apagar todas as marcações do dia atual?\nIsso também removerá os registros da planilha!')) return;
+            
+            statusText.textContent = 'Removendo registros da planilha...';
+            
+            marcacoes = [
+                { hora: null, local: null, iso: null },
+                { hora: null, local: null, iso: null },
+                { hora: null, local: null, iso: null },
+                { hora: null, local: null, iso: null }
+            ];
+            
+            await salvarNoGoogleSheet('resetar');
+            
+            proximoIndice = 0;
+            atualizarCardsMarcacoes();
+            salvarEstadoAtualNoStorage();
+            statusText.textContent = '✅ Dia resetado! Registros removidos da planilha.';
+        }
+
+        function gerenciarColaboradores() {
+            let mensagem = '📋 COLABORADORES CADASTRADOS:\n\n';
+            colaboradores.forEach((c, i) => mensagem += `${i+1}. ${c.nome}\n`);
+            mensagem += '\n━━━━━━━━━━━━━━━━━━━━\n';
+            mensagem += 'Digite o NÚMERO ou NOME para remover\n';
+            mensagem += 'Ou digite "LIMPAR" para remover todos';
+            
+            const acao = prompt(mensagem);
+            if (!acao) return;
+            
+            if (acao.toUpperCase() === 'LIMPAR') {
+                if (confirm('⚠️ Remover TODOS os colaboradores?')) {
+                    colaboradores = [{ nome: 'Funcionário Padrão' }];
+                    salvarColaboradoresStorage();
+                    atualizarSelectColaboradores();
+                    statusText.textContent = '✅ Lista resetada!';
+                }
+                return;
+            }
+            
+            const num = parseInt(acao);
+            if (!isNaN(num) && num > 0 && num <= colaboradores.length) {
+                removerColaborador(num - 1);
+                return;
+            }
+            
+            const index = colaboradores.findIndex(c => c.nome.toLowerCase().includes(acao.toLowerCase()));
+            if (index !== -1) removerColaborador(index);
+            else alert('❌ Colaborador não encontrado!');
+        }
+
+        function removerColaborador(index) {
+            if (colaboradores.length === 1) { alert('⚠️ Não é possível remover o único colaborador!'); return; }
+            const nome = colaboradores[index].nome;
+            if (confirm(`Remover "${nome}"?`)) {
+                colaboradores.splice(index, 1);
+                salvarColaboradoresStorage();
+                atualizarSelectColaboradores();
+                statusText.textContent = `✅ "${nome}" removido!`;
             }
         }
 
@@ -872,7 +784,7 @@
             const dataFim = filtroDataFim.value;
             
             if (!dataInicio || !dataFim) {
-                resultadoRelatorio.innerHTML = '<div class="sem-registros">Selecione as datas de início e fim</div>';
+                resultadoRelatorio.innerHTML = '<div class="sem-registros">Selecione as datas</div>';
                 return;
             }
 
@@ -884,7 +796,7 @@
             });
 
             if (registrosFiltrados.length === 0) {
-                resultadoRelatorio.innerHTML = '<div class="sem-registros"><i class="fas fa-search"></i> Nenhum registro encontrado no período</div>';
+                resultadoRelatorio.innerHTML = '<div class="sem-registros">Nenhum registro encontrado</div>';
                 return;
             }
 
@@ -895,36 +807,50 @@
                     agrupado[chave] = {
                         data: reg.data,
                         colaborador: reg.colaborador,
-                        marcacoes: [reg.marcacao1, reg.marcacao2, reg.marcacao3, reg.marcacao4]
+                        m1: reg.marcacao1 || '—',
+                        m2: reg.marcacao2 || '—',
+                        m3: reg.marcacao3 || '—',
+                        m4: reg.marcacao4 || '—'
                     };
                 }
             });
 
-            let html = '';
-            Object.values(agrupado).forEach(reg => {
+            let html = `
+                <table class="tabela-relatorio">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Colaborador</th>
+                            <th>1ª</th>
+                            <th>2ª</th>
+                            <th>3ª</th>
+                            <th>4ª</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            Object.values(agrupado).sort((a, b) => b.data.localeCompare(a.data)).forEach(reg => {
                 html += `
-                    <div class="registro-item">
-                        <div class="registro-header">
-                            <span><i class="far fa-calendar"></i> ${reg.data}</span>
-                            <span><i class="fas fa-user"></i> ${reg.colaborador}</span>
-                        </div>
-                        <div class="registro-horarios">
-                            <div class="horario-item"><span>🏁 Entrada:</span> <strong>${reg.marcacoes[0] || '—'}</strong></div>
-                            <div class="horario-item"><span>🍽️ Saída Almoço:</span> <strong>${reg.marcacoes[1] || '—'}</strong></div>
-                            <div class="horario-item"><span>↩️ Retorno:</span> <strong>${reg.marcacoes[2] || '—'}</strong></div>
-                            <div class="horario-item"><span>🏁 Saída:</span> <strong>${reg.marcacoes[3] || '—'}</strong></div>
-                        </div>
-                    </div>
+                    <tr>
+                        <td>${reg.data}</td>
+                        <td class="colab-nome">${reg.colaborador}</td>
+                        <td class="hora-cell">${reg.m1}</td>
+                        <td class="hora-cell">${reg.m2}</td>
+                        <td class="hora-cell">${reg.m3}</td>
+                        <td class="hora-cell">${reg.m4}</td>
+                    </tr>
                 `;
             });
-
+            
+            html += '</tbody></table>';
             resultadoRelatorio.innerHTML = html;
         }
 
         function toggleRelatorio() {
             if (relatorioSection.style.display === 'none') {
                 relatorioSection.style.display = 'block';
-                btnToggleRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar Relatório';
+                btnToggleRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar';
                 carregarHistoricoCompleto();
                 buscarRelatorio();
             } else {
@@ -979,7 +905,7 @@
             salvarColaboradoresStorage();
             colaboradorSelecionado = nomeLimpo;
             atualizarSelectColaboradores();
-            statusText.textContent = `Colaborador "${nomeLimpo}" adicionado.`;
+            statusText.textContent = `✅ "${nomeLimpo}" adicionado!`;
         }
 
         function inicializar() {
@@ -997,6 +923,7 @@
             btnCadastrar.addEventListener('click', cadastrarNovoColaborador);
             btnMarcar.addEventListener('click', registrarPonto);
             btnReset.addEventListener('click', resetarDia);
+            btnGerenciarColabs.addEventListener('click', gerenciarColaboradores);
             btnToggleRelatorio.addEventListener('click', toggleRelatorio);
             btnFecharRelatorio.addEventListener('click', () => {
                 relatorioSection.style.display = 'none';
@@ -1004,8 +931,6 @@
             });
             btnBuscarRelatorio.addEventListener('click', buscarRelatorio);
             window.addEventListener('beforeunload', () => salvarEstadoAtualNoStorage());
-            
-            console.log('✅ Sistema inicializado!');
         }
 
         inicializar();
