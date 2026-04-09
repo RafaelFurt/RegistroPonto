@@ -444,7 +444,7 @@
     </div>
 
     <div class="footer-note">
-        <i class="fas fa-location-dot" style="color:#620000;"></i> Localização automática • Horário real • Dados sincronizados
+        <i class="fas fa-location-dot" style="color:#620000;"></i> Localização automática • Horário real • Sincronizado
     </div>
 </div>
 
@@ -511,17 +511,72 @@
         atualizarDataAtual();
         setInterval(atualizarDataAtual, 60000);
 
-        function carregarColaboradores() {
+        // ============================================
+        // CARREGAR COLABORADORES (SINCRONIZADO COM PLANILHA)
+        // ============================================
+        async function carregarColaboradores() {
+            // Primeiro tenta carregar do localStorage
             const stored = localStorage.getItem('ponto_colaboradores');
             if (stored) {
                 try { colaboradores = JSON.parse(stored); } catch(e){ colaboradores = []; }
             }
-            if (!colaboradores.length) {
-                colaboradores = [{ nome: 'Funcionário Padrão' }];
-            }
-            colaboradores = colaboradores.filter(c => c && typeof c.nome === 'string').map(c => ({ nome: c.nome.trim() || 'Sem nome' }));
-            if (colaboradores.length === 0) colaboradores = [{ nome: 'Colaborador' }];
-            salvarColaboradoresStorage();
+            
+            // Depois busca da planilha para sincronizar
+            statusText.textContent = '🔄 Sincronizando colaboradores...';
+            
+            const params = new URLSearchParams();
+            params.append('acao', 'consultar_colaboradores');
+            params.append('callback', 'jsonpCallback');
+            
+            const url = SCRIPT_URL + '?' + params.toString();
+            console.log('👥 Buscando colaboradores:', url);
+            
+            return new Promise((resolve) => {
+                const callbackName = 'jsonpCallback_' + Date.now();
+                window[callbackName] = (response) => {
+                    console.log('👥 Resposta colaboradores:', response);
+                    
+                    if (response.status === 'success' && response.colaboradores) {
+                        // Mescla com colaboradores locais (evita duplicatas)
+                        const nomesExistentes = colaboradores.map(c => c.nome);
+                        response.colaboradores.forEach(c => {
+                            if (!nomesExistentes.includes(c.nome)) {
+                                colaboradores.push(c);
+                            }
+                        });
+                        
+                        if (colaboradores.length === 0) {
+                            colaboradores = [{ nome: 'Funcionário Padrão' }];
+                        }
+                        
+                        salvarColaboradoresStorage();
+                        statusText.textContent = '✅ Colaboradores sincronizados!';
+                    }
+                    
+                    atualizarSelectColaboradores();
+                    carregarEstadoColaborador();
+                    
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(true);
+                };
+                
+                const script = document.createElement('script');
+                script.src = url.replace('jsonpCallback', callbackName);
+                script.onerror = () => {
+                    console.log('⚠️ Fallback para localStorage');
+                    if (!colaboradores.length) {
+                        colaboradores = [{ nome: 'Funcionário Padrão' }];
+                    }
+                    atualizarSelectColaboradores();
+                    carregarEstadoColaborador();
+                    statusText.textContent = '📋 Usando dados locais';
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(false);
+                };
+                document.body.appendChild(script);
+            });
         }
 
         function salvarColaboradoresStorage() {
@@ -952,10 +1007,8 @@
             statusText.textContent = `✅ "${nomeLimpo}" adicionado!`;
         }
 
-        function inicializar() {
-            carregarColaboradores();
-            atualizarSelectColaboradores();
-            carregarEstadoColaborador();
+        async function inicializar() {
+            await carregarColaboradores();
             
             selectColab.addEventListener('change', (e) => {
                 salvarEstadoAtualNoStorage();
