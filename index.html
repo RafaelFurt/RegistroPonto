@@ -1033,15 +1033,126 @@ async function buscarRelatorio() {
             statusText.textContent = `✅ "${nomeLimpo}" adicionado!`;
         }
 
-        async function inicializar() {
-            await carregarColaboradores();
+// ============================================
+// CARREGAR MARCAÇÕES DO DIA ATUAL DA PLANILHA
+// ============================================
+async function carregarMarcacoesDoDia() {
+    if (!colaboradorSelecionado) return;
+    
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    const dataFormatada = hoje; // Formato dd/MM/yyyy
+    
+    statusText.textContent = '🔄 Carregando marcações do dia...';
+    
+    const params = new URLSearchParams();
+    params.append('acao', 'consultar');
+    params.append('dataInicio', new Date().toISOString().split('T')[0]);
+    params.append('dataFim', new Date().toISOString().split('T')[0]);
+    params.append('colaborador', colaboradorSelecionado);
+    params.append('callback', 'jsonpCallback');
+
+    const url = SCRIPT_URL + '?' + params.toString();
+    
+    return new Promise((resolve) => {
+        const callbackName = 'jsonpCallback_' + Date.now();
+        window[callbackName] = function(response) {
+            console.log('📊 Marcações do dia:', response);
             
-            selectColab.addEventListener('change', (e) => {
+            if (response.status === 'success' && response.registros && response.registros.length > 0) {
+                const registro = response.registros[0];
+                
+                // Função para extrair apenas HH:MM:SS
+                function extrairHora(hora) {
+                    if (!hora) return null;
+                    if (hora.match(/^\d{2}:\d{2}:\d{2}$/)) return hora;
+                    if (typeof hora === 'string' && hora.includes('GMT')) {
+                        const match = hora.match(/(\d{2}):(\d{2}):(\d{2})/);
+                        if (match) return match[1] + ':' + match[2] + ':' + match[3];
+                    }
+                    return hora;
+                }
+                
+                // Atualizar as marcações
+                if (registro.marcacao1) {
+                    marcacoes[0] = { 
+                        hora: extrairHora(registro.marcacao1), 
+                        local: 'Carregado da planilha', 
+                        iso: new Date().toISOString() 
+                    };
+                }
+                if (registro.marcacao2) {
+                    marcacoes[1] = { 
+                        hora: extrairHora(registro.marcacao2), 
+                        local: 'Carregado da planilha', 
+                        iso: new Date().toISOString() 
+                    };
+                }
+                if (registro.marcacao3) {
+                    marcacoes[2] = { 
+                        hora: extrairHora(registro.marcacao3), 
+                        local: 'Carregado da planilha', 
+                        iso: new Date().toISOString() 
+                    };
+                }
+                if (registro.marcacao4) {
+                    marcacoes[3] = { 
+                        hora: extrairHora(registro.marcacao4), 
+                        local: 'Carregado da planilha', 
+                        iso: new Date().toISOString() 
+                    };
+                }
+                
+                // Atualizar próximo índice
+                proximoIndice = marcacoes.findIndex(m => m.hora === null);
+                if (proximoIndice === -1) proximoIndice = 4;
+                
+                atualizarCardsMarcacoes();
                 salvarEstadoAtualNoStorage();
-                colaboradorSelecionado = e.target.value;
-                carregarEstadoColaborador();
-                atualizarStatusBotao();
-            });
+                
+                statusText.textContent = '✅ Marcações do dia carregadas!';
+            } else {
+                // Não encontrou registros do dia, reseta
+                resetarMarcacoes();
+                atualizarCardsMarcacoes();
+                statusText.textContent = '📋 Nenhuma marcação hoje. Pronto para registrar.';
+            }
+            
+            delete window[callbackName];
+            document.body.removeChild(script);
+            resolve(true);
+        };
+
+        const script = document.createElement('script');
+        script.src = url.replace('jsonpCallback', callbackName);
+        script.onerror = function() {
+            console.log('⚠️ Erro ao carregar marcações do dia');
+            statusText.textContent = '📋 Usando dados locais';
+            delete window[callbackName];
+            document.body.removeChild(script);
+            resolve(false);
+        };
+        document.body.appendChild(script);
+    });
+}
+
+async function inicializar() {
+    await carregarColaboradores();
+    
+    // CARREGAR MARCAÇÕES DO DIA DA PLANILHA
+    if (colaboradorSelecionado) {
+        await carregarMarcacoesDoDia();
+    }
+    
+    selectColab.addEventListener('change', async (e) => {
+        salvarEstadoAtualNoStorage();
+        colaboradorSelecionado = e.target.value;
+        // CARREGAR MARCAÇÕES DO NOVO COLABORADOR
+        await carregarMarcacoesDoDia();
+        atualizarStatusBotao();
+    });
+
+    // ... resto do código existente ...
+}
 
             btnCadastrar.addEventListener('click', cadastrarNovoColaborador);
             btnMarcar.addEventListener('click', registrarPonto);
