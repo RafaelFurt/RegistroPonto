@@ -444,7 +444,7 @@
     </div>
 
     <div class="footer-note">
-        <i class="fas fa-location-dot" style="color:#620000;"></i> Localização automática • Horário real • Salvo automaticamente
+        <i class="fas fa-location-dot" style="color:#620000;"></i> Localização automática • Horário real • Dados sincronizados
     </div>
 </div>
 
@@ -452,8 +452,7 @@
     (function(){
         "use strict";
 
-        // ⚠️ SUBSTITUA PELA URL CORRETA DO SEU WEB APP (doGet)
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXjU5LCsjg8tyCYk996YTPhze3tzsiNpOG28aggnLl5QWuZ13mbk5Ml9EA11qNH3Kd/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwkY-vI7KgD-b1DUhu3P99eXRQHONC3WyNCbnX0BGLQ4ZRs6AXyh30QpB5Vm2nBPL4n/exec';
 
         let colaboradores = [];
         let colaboradorSelecionado = null;
@@ -598,9 +597,6 @@
             });
         }
 
-        // ============================================
-        // FUNÇÃO JSONP VIA GET
-        // ============================================
         async function salvarNoGoogleSheet(acao = 'registrar') {
             if (!colaboradorSelecionado) return false;
 
@@ -666,14 +662,8 @@
             });
         }
 
-        // ============================================
-        // FUNÇÃO CORRIGIDA - ATUALIZA REGISTRO EXISTENTE
-        // ============================================
         function salvarRegistroLocal(payload) {
-            // Carrega histórico atual
             const historico = JSON.parse(localStorage.getItem('ponto_historico_completo') || '[]');
-            
-            // Procura se já existe registro do dia para este colaborador
             const dataHoje = payload.data;
             const colaborador = payload.colaborador;
             const indexExistente = historico.findIndex(reg => 
@@ -681,7 +671,6 @@
             );
             
             if (indexExistente !== -1) {
-                // ATUALIZA o registro existente (mantém marcações anteriores)
                 const registroExistente = historico[indexExistente];
                 historico[indexExistente] = {
                     colaborador: colaborador,
@@ -695,7 +684,6 @@
                 };
                 console.log('📝 Registro ATUALIZADO:', historico[indexExistente]);
             } else {
-                // CRIA novo registro
                 historico.push({ 
                     colaborador: colaborador,
                     data: dataHoje,
@@ -709,9 +697,8 @@
                 console.log('📝 Novo registro CRIADO:', payload);
             }
             
-            // Salva no localStorage
             localStorage.setItem('ponto_historico_completo', JSON.stringify(historico));
-            historicoCompleto = historico; // Atualiza variável global
+            historicoCompleto = historico;
         }
 
         async function registrarPonto() {
@@ -809,19 +796,10 @@
             }
         }
 
-        function carregarHistoricoCompleto() {
-            const historico = localStorage.getItem('ponto_historico_completo');
-            if (historico) {
-                try { historicoCompleto = JSON.parse(historico); } catch(e) { historicoCompleto = []; }
-            }
-            return historicoCompleto;
-        }
-
         // ============================================
-        // FUNÇÃO BUSCAR RELATÓRIO CORRIGIDA
+        // BUSCAR RELATÓRIO - DIRETO DO GOOGLE SHEETS
         // ============================================
-        function buscarRelatorio() {
-            carregarHistoricoCompleto();
+        async function buscarRelatorio() {
             const dataInicio = filtroDataInicio.value;
             const dataFim = filtroDataFim.value;
             
@@ -830,65 +808,93 @@
                 return;
             }
 
-            const inicio = new Date(dataInicio + 'T00:00:00');
-            const fim = new Date(dataFim + 'T23:59:59');
+            statusText.textContent = '🔄 Buscando dados da planilha...';
+            
+            const params = new URLSearchParams();
+            params.append('acao', 'consultar');
+            params.append('dataInicio', dataInicio);
+            params.append('dataFim', dataFim);
+            params.append('colaborador', colaboradorSelecionado || 'todos');
+            params.append('callback', 'jsonpCallback');
 
-            const registrosFiltrados = historicoCompleto.filter(reg => {
-                if (!colaboradorSelecionado) return true;
-                if (reg.colaborador !== colaboradorSelecionado) return false;
-                
-                const partes = reg.data.split('/');
-                const dataReg = new Date(partes[2], partes[1] - 1, partes[0]);
-                
-                return dataReg >= inicio && dataReg <= fim;
+            const url = SCRIPT_URL + '?' + params.toString();
+            console.log('🔍 Buscando:', url);
+
+            return new Promise((resolve) => {
+                const callbackName = 'jsonpCallback_' + Date.now();
+                window[callbackName] = function(response) {
+                    console.log('📊 Dados recebidos:', response);
+                    
+                    if (response.status === 'success' && response.registros) {
+                        const registros = response.registros;
+                        
+                        if (registros.length === 0) {
+                            resultadoRelatorio.innerHTML = '<div class="sem-registros">Nenhum registro encontrado</div>';
+                            dadosTabelaAtual = [];
+                            statusText.textContent = '📋 Nenhum registro no período';
+                        } else {
+                            dadosTabelaAtual = registros.sort((a, b) => {
+                                const partesA = a.data.split('/');
+                                const partesB = b.data.split('/');
+                                if (partesA.length === 3 && partesB.length === 3) {
+                                    const dataA = new Date(partesA[2], partesA[1] - 1, partesA[0]);
+                                    const dataB = new Date(partesB[2], partesB[1] - 1, partesB[0]);
+                                    return dataB - dataA;
+                                }
+                                return 0;
+                            }).map(reg => ({
+                                data: reg.data,
+                                colaborador: reg.colaborador,
+                                m1: reg.marcacao1 || '—',
+                                m2: reg.marcacao2 || '—',
+                                m3: reg.marcacao3 || '—',
+                                m4: reg.marcacao4 || '—'
+                            }));
+                            
+                            let html = `
+                                <table class="tabela-relatorio" id="tabelaExport">
+                                    <thead><tr><th>Data</th><th>Colaborador</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead>
+                                    <tbody>
+                            `;
+                            
+                            dadosTabelaAtual.forEach(reg => {
+                                html += `<tr><td>${reg.data}</td><td class="colab-nome">${reg.colaborador}</td><td class="hora-cell">${reg.m1}</td><td class="hora-cell">${reg.m2}</td><td class="hora-cell">${reg.m3}</td><td class="hora-cell">${reg.m4}</td></tr>`;
+                            });
+                            
+                            html += '</tbody></table>';
+                            resultadoRelatorio.innerHTML = html;
+                            statusText.textContent = `✅ ${registros.length} registros encontrados`;
+                        }
+                    } else {
+                        resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro ao buscar dados</div>';
+                        statusText.textContent = '❌ Erro na consulta';
+                    }
+                    
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(true);
+                };
+
+                const script = document.createElement('script');
+                script.src = url.replace('jsonpCallback', callbackName);
+                script.onerror = function() {
+                    console.error('❌ Erro na consulta');
+                    resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro de conexão</div>';
+                    statusText.textContent = '❌ Erro de conexão';
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(false);
+                };
+                document.body.appendChild(script);
+
+                setTimeout(() => {
+                    if (window[callbackName]) {
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                        resolve(false);
+                    }
+                }, 15000);
             });
-
-            console.log('📊 Registros filtrados:', registrosFiltrados);
-
-            if (registrosFiltrados.length === 0) {
-                resultadoRelatorio.innerHTML = '<div class="sem-registros">Nenhum registro encontrado</div>';
-                dadosTabelaAtual = [];
-                return;
-            }
-
-            dadosTabelaAtual = registrosFiltrados.sort((a, b) => {
-                const partesA = a.data.split('/');
-                const partesB = b.data.split('/');
-                const dataA = new Date(partesA[2], partesA[1] - 1, partesA[0]);
-                const dataB = new Date(partesB[2], partesB[1] - 1, partesB[0]);
-                return dataB - dataA;
-            }).map(reg => ({
-                data: reg.data,
-                colaborador: reg.colaborador,
-                m1: reg.marcacao1 || '—',
-                m2: reg.marcacao2 || '—',
-                m3: reg.marcacao3 || '—',
-                m4: reg.marcacao4 || '—'
-            }));
-            
-            let html = `
-                <table class="tabela-relatorio" id="tabelaExport">
-                    <thead><tr><th>Data</th><th>Colaborador</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead>
-                    <tbody>
-            `;
-            
-            dadosTabelaAtual.forEach(reg => {
-                html += `<tr><td>${reg.data}</td><td class="colab-nome">${reg.colaborador}</td><td class="hora-cell">${reg.m1}</td><td class="hora-cell">${reg.m2}</td><td class="hora-cell">${reg.m3}</td><td class="hora-cell">${reg.m4}</td></tr>`;
-            });
-            
-            html += '</tbody></table>';
-            resultadoRelatorio.innerHTML = html;
-        }
-
-        // Função para limpar cache do dia (útil para teste)
-        function limparCacheHoje() {
-            const hoje = new Date().toLocaleDateString('pt-BR');
-            const historico = JSON.parse(localStorage.getItem('ponto_historico_completo') || '[]');
-            const novoHistorico = historico.filter(reg => reg.data !== hoje);
-            localStorage.setItem('ponto_historico_completo', JSON.stringify(novoHistorico));
-            historicoCompleto = novoHistorico;
-            console.log('✅ Cache de hoje limpo!');
-            buscarRelatorio();
         }
 
         function exportarExcel() {
@@ -944,7 +950,6 @@
             if (relatorioSection.style.display === 'none') {
                 relatorioSection.style.display = 'block';
                 btnToggleRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar';
-                carregarHistoricoCompleto();
                 buscarRelatorio();
             } else {
                 relatorioSection.style.display = 'none';
@@ -1026,9 +1031,6 @@
             btnExportExcel.addEventListener('click', exportarExcel);
             btnExportPNG.addEventListener('click', exportarPNG);
             window.addEventListener('beforeunload', () => salvarEstadoAtualNoStorage());
-            
-            // Expor função de limpeza para debug
-            window.limparCacheHoje = limparCacheHoje;
         }
 
         inicializar();
