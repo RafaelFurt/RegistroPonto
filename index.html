@@ -800,104 +800,130 @@
             }
         }
 
-        async function buscarRelatorio() {
-            const dataInicio = filtroDataInicio.value;
-            const dataFim = filtroDataFim.value;
+async function buscarRelatorio() {
+    const dataInicio = filtroDataInicio.value;
+    const dataFim = filtroDataFim.value;
+    
+    if (!dataInicio || !dataFim) {
+        resultadoRelatorio.innerHTML = '<div class="sem-registros">Selecione as datas</div>';
+        return;
+    }
+
+    statusText.textContent = '🔄 Buscando dados da planilha...';
+    
+    const params = new URLSearchParams();
+    params.append('acao', 'consultar');
+    params.append('dataInicio', dataInicio);
+    params.append('dataFim', dataFim);
+    params.append('colaborador', colaboradorSelecionado || 'todos');
+    params.append('callback', 'jsonpCallback');
+
+    const url = SCRIPT_URL + '?' + params.toString();
+    console.log('🔍 Buscando:', url);
+
+    return new Promise((resolve) => {
+        const callbackName = 'jsonpCallback_' + Date.now();
+        window[callbackName] = function(response) {
+            console.log('📊 Dados recebidos:', response);
             
-            if (!dataInicio || !dataFim) {
-                resultadoRelatorio.innerHTML = '<div class="sem-registros">Selecione as datas</div>';
-                return;
-            }
-
-            statusText.textContent = '🔄 Buscando dados da planilha...';
-            
-            const params = new URLSearchParams();
-            params.append('acao', 'consultar');
-            params.append('dataInicio', dataInicio);
-            params.append('dataFim', dataFim);
-            params.append('colaborador', colaboradorSelecionado || 'todos');
-            params.append('callback', 'jsonpCallback');
-
-            const url = SCRIPT_URL + '?' + params.toString();
-            console.log('🔍 Buscando:', url);
-
-            return new Promise((resolve) => {
-                const callbackName = 'jsonpCallback_' + Date.now();
-                window[callbackName] = function(response) {
-                    console.log('📊 Dados recebidos:', response);
-                    
-                    if (response.status === 'success' && response.registros) {
-                        const registros = response.registros;
-                        
-                        if (registros.length === 0) {
-                            resultadoRelatorio.innerHTML = '<div class="sem-registros">Nenhum registro encontrado</div>';
-                            dadosTabelaAtual = [];
-                            statusText.textContent = '📋 Nenhum registro no período';
-                        } else {
-                            dadosTabelaAtual = registros.sort((a, b) => {
-                                const partesA = a.data.split('/');
-                                const partesB = b.data.split('/');
-                                if (partesA.length === 3 && partesB.length === 3) {
-                                    const dataA = new Date(partesA[2], partesA[1] - 1, partesA[0]);
-                                    const dataB = new Date(partesB[2], partesB[1] - 1, partesB[0]);
-                                    return dataB - dataA;
-                                }
-                                return 0;
-                            }).map(reg => ({
-                                data: reg.data,
-                                colaborador: reg.colaborador,
-                                m1: reg.marcacao1 || '—',
-                                m2: reg.marcacao2 || '—',
-                                m3: reg.marcacao3 || '—',
-                                m4: reg.marcacao4 || '—'
-                            }));
-                            
-                            let html = `
-                                <table class="tabela-relatorio" id="tabelaExport">
-                                    <thead><tr><th>Data</th><th>Colaborador</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead>
-                                    <tbody>
-                            `;
-                            
-                            dadosTabelaAtual.forEach(reg => {
-                                html += `<tr><td>${reg.data}</td><td class="colab-nome">${reg.colaborador}</td><td class="hora-cell">${reg.m1}</td><td class="hora-cell">${reg.m2}</td><td class="hora-cell">${reg.m3}</td><td class="hora-cell">${reg.m4}</td></tr>`;
-                            });
-                            
-                            html += '</tbody></table>';
-                            resultadoRelatorio.innerHTML = html;
-                            statusText.textContent = `✅ ${registros.length} registros encontrados`;
+            if (response.status === 'success' && response.registros) {
+                const registros = response.registros;
+                
+                if (registros.length === 0) {
+                    resultadoRelatorio.innerHTML = '<div class="sem-registros">Nenhum registro encontrado</div>';
+                    dadosTabelaAtual = [];
+                    statusText.textContent = '📋 Nenhum registro no período';
+                } else {
+                    dadosTabelaAtual = registros.sort((a, b) => {
+                        const partesA = a.data.split('/');
+                        const partesB = b.data.split('/');
+                        if (partesA.length === 3 && partesB.length === 3) {
+                            const dataA = new Date(partesA[2], partesA[1] - 1, partesA[0]);
+                            const dataB = new Date(partesB[2], partesB[1] - 1, partesB[0]);
+                            return dataB - dataA;
                         }
-                    } else {
-                        resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro ao buscar dados</div>';
-                        statusText.textContent = '❌ Erro na consulta';
-                    }
+                        return 0;
+                    }).map(reg => {
+                        // Função para formatar hora
+                        function formatarHoraExibicao(hora) {
+                            if (!hora || hora === '—') return '—';
+                            if (hora.match(/^\d{2}:\d{2}:\d{2}$/)) return hora;
+                            if (typeof hora === 'string' && hora.includes('GMT')) {
+                                const match = hora.match(/(\d{2}):(\d{2}):(\d{2})/);
+                                if (match) return match[1] + ':' + match[2] + ':' + match[3];
+                            }
+                            return hora;
+                        }
+                        
+                        // Função para formatar data
+                        function formatarDataExibicao(data) {
+                            if (!data) return '—';
+                            if (data.match(/^\d{2}\/\d{2}\/\d{4}$/)) return data;
+                            if (typeof data === 'string' && data.includes('GMT')) {
+                                const match = data.match(/(\w{3}) (\w{3}) (\d{2}) (\d{4})/);
+                                if (match) {
+                                    const meses = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+                                    return match[3] + '/' + meses[match[2]] + '/' + match[4];
+                                }
+                            }
+                            return data;
+                        }
+                        
+                        return {
+                            data: formatarDataExibicao(reg.data),
+                            colaborador: reg.colaborador,
+                            m1: formatarHoraExibicao(reg.marcacao1),
+                            m2: formatarHoraExibicao(reg.marcacao2),
+                            m3: formatarHoraExibicao(reg.marcacao3),
+                            m4: formatarHoraExibicao(reg.marcacao4)
+                        };
+                    });
                     
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    resolve(true);
-                };
+                    let html = `
+                        <table class="tabela-relatorio" id="tabelaExport">
+                            <thead><tr><th>Data</th><th>Colaborador</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead>
+                            <tbody>
+                    `;
+                    
+                    dadosTabelaAtual.forEach(reg => {
+                        html += `<tr><td>${reg.data}</td><td class="colab-nome">${reg.colaborador}</td><td class="hora-cell">${reg.m1}</td><td class="hora-cell">${reg.m2}</td><td class="hora-cell">${reg.m3}</td><td class="hora-cell">${reg.m4}</td></tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    resultadoRelatorio.innerHTML = html;
+                    statusText.textContent = `✅ ${registros.length} registros encontrados`;
+                }
+            } else {
+                resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro ao buscar dados</div>';
+                statusText.textContent = '❌ Erro na consulta';
+            }
+            
+            delete window[callbackName];
+            document.body.removeChild(script);
+            resolve(true);
+        };
 
-                const script = document.createElement('script');
-                script.src = url.replace('jsonpCallback', callbackName);
-                script.onerror = function() {
-                    console.error('❌ Erro na consulta');
-                    resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro de conexão</div>';
-                    statusText.textContent = '❌ Erro de conexão';
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    resolve(false);
-                };
-                document.body.appendChild(script);
+        const script = document.createElement('script');
+        script.src = url.replace('jsonpCallback', callbackName);
+        script.onerror = function() {
+            console.error('❌ Erro na consulta');
+            resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro de conexão</div>';
+            statusText.textContent = '❌ Erro de conexão';
+            delete window[callbackName];
+            document.body.removeChild(script);
+            resolve(false);
+        };
+        document.body.appendChild(script);
 
-                setTimeout(() => {
-                    if (window[callbackName]) {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        resolve(false);
-                    }
-                }, 15000);
-            });
-        }
-
+        setTimeout(() => {
+            if (window[callbackName]) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                resolve(false);
+            }
+        }, 15000);
+    });
+}
         function exportarExcel() {
             if (dadosTabelaAtual.length === 0) {
                 alert('Nenhum dado para exportar!');
