@@ -1039,79 +1039,103 @@ async function buscarRelatorio() {
 async function carregarMarcacoesDoDia() {
     if (!colaboradorSelecionado) return;
     
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    const dataFormatada = hoje; // Formato dd/MM/yyyy
-    
     statusText.textContent = '🔄 Carregando marcações do dia...';
+    
+    // Formatar data de hoje no padrão brasileiro DD/MM/YYYY
+    const hoje = new Date();
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const ano = hoje.getFullYear();
+    const dataHoje = dia + '/' + mes + '/' + ano;
+    
+    console.log('📅 Buscando marcações para:', colaboradorSelecionado, 'Data:', dataHoje);
     
     const params = new URLSearchParams();
     params.append('acao', 'consultar');
-    params.append('dataInicio', new Date().toISOString().split('T')[0]);
-    params.append('dataFim', new Date().toISOString().split('T')[0]);
+    // Buscar um período maior para garantir (últimos 7 dias)
+    const dataInicio = new Date();
+    dataInicio.setDate(dataInicio.getDate() - 7);
+    const inicioFormatado = dataInicio.toISOString().split('T')[0];
+    const fimFormatado = new Date().toISOString().split('T')[0];
+    
+    params.append('dataInicio', inicioFormatado);
+    params.append('dataFim', fimFormatado);
     params.append('colaborador', colaboradorSelecionado);
     params.append('callback', 'jsonpCallback');
 
     const url = SCRIPT_URL + '?' + params.toString();
+    console.log('🔍 URL busca marcações:', url);
     
     return new Promise((resolve) => {
         const callbackName = 'jsonpCallback_' + Date.now();
         window[callbackName] = function(response) {
-            console.log('📊 Marcações do dia:', response);
+            console.log('📊 Resposta marcações:', response);
             
             if (response.status === 'success' && response.registros && response.registros.length > 0) {
-                const registro = response.registros[0];
+                // Filtrar apenas o registro de HOJE (formato DD/MM/YYYY)
+                const registroHoje = response.registros.find(reg => reg.data === dataHoje);
                 
-                // Função para extrair apenas HH:MM:SS
-                function extrairHora(hora) {
-                    if (!hora) return null;
-                    if (hora.match(/^\d{2}:\d{2}:\d{2}$/)) return hora;
-                    if (typeof hora === 'string' && hora.includes('GMT')) {
-                        const match = hora.match(/(\d{2}):(\d{2}):(\d{2})/);
-                        if (match) return match[1] + ':' + match[2] + ':' + match[3];
+                if (registroHoje) {
+                    console.log('✅ Encontrou registro de hoje:', registroHoje);
+                    
+                    // Função para extrair apenas HH:MM:SS
+                    function extrairHora(hora) {
+                        if (!hora) return null;
+                        if (hora.match(/^\d{2}:\d{2}:\d{2}$/)) return hora;
+                        if (typeof hora === 'string' && hora.includes('GMT')) {
+                            const match = hora.match(/(\d{2}):(\d{2}):(\d{2})/);
+                            if (match) return match[1] + ':' + match[2] + ':' + match[3];
+                        }
+                        return hora;
                     }
-                    return hora;
+                    
+                    // Atualizar as marcações
+                    if (registroHoje.marcacao1) {
+                        marcacoes[0] = { 
+                            hora: extrairHora(registroHoje.marcacao1), 
+                            local: 'Carregado da planilha', 
+                            iso: new Date().toISOString() 
+                        };
+                    }
+                    if (registroHoje.marcacao2) {
+                        marcacoes[1] = { 
+                            hora: extrairHora(registroHoje.marcacao2), 
+                            local: 'Carregado da planilha', 
+                            iso: new Date().toISOString() 
+                        };
+                    }
+                    if (registroHoje.marcacao3) {
+                        marcacoes[2] = { 
+                            hora: extrairHora(registroHoje.marcacao3), 
+                            local: 'Carregado da planilha', 
+                            iso: new Date().toISOString() 
+                        };
+                    }
+                    if (registroHoje.marcacao4) {
+                        marcacoes[3] = { 
+                            hora: extrairHora(registroHoje.marcacao4), 
+                            local: 'Carregado da planilha', 
+                            iso: new Date().toISOString() 
+                        };
+                    }
+                    
+                    // Atualizar próximo índice
+                    proximoIndice = marcacoes.findIndex(m => m.hora === null);
+                    if (proximoIndice === -1) proximoIndice = 4;
+                    
+                    atualizarCardsMarcacoes();
+                    salvarEstadoAtualNoStorage();
+                    
+                    statusText.textContent = '✅ Marcações de hoje carregadas!';
+                } else {
+                    console.log('📋 Nenhum registro para hoje (' + dataHoje + ')');
+                    // Não encontrou registros de hoje, reseta
+                    resetarMarcacoes();
+                    atualizarCardsMarcacoes();
+                    statusText.textContent = '📋 Nenhuma marcação hoje. Pronto para registrar.';
                 }
-                
-                // Atualizar as marcações
-                if (registro.marcacao1) {
-                    marcacoes[0] = { 
-                        hora: extrairHora(registro.marcacao1), 
-                        local: 'Carregado da planilha', 
-                        iso: new Date().toISOString() 
-                    };
-                }
-                if (registro.marcacao2) {
-                    marcacoes[1] = { 
-                        hora: extrairHora(registro.marcacao2), 
-                        local: 'Carregado da planilha', 
-                        iso: new Date().toISOString() 
-                    };
-                }
-                if (registro.marcacao3) {
-                    marcacoes[2] = { 
-                        hora: extrairHora(registro.marcacao3), 
-                        local: 'Carregado da planilha', 
-                        iso: new Date().toISOString() 
-                    };
-                }
-                if (registro.marcacao4) {
-                    marcacoes[3] = { 
-                        hora: extrairHora(registro.marcacao4), 
-                        local: 'Carregado da planilha', 
-                        iso: new Date().toISOString() 
-                    };
-                }
-                
-                // Atualizar próximo índice
-                proximoIndice = marcacoes.findIndex(m => m.hora === null);
-                if (proximoIndice === -1) proximoIndice = 4;
-                
-                atualizarCardsMarcacoes();
-                salvarEstadoAtualNoStorage();
-                
-                statusText.textContent = '✅ Marcações do dia carregadas!';
             } else {
-                // Não encontrou registros do dia, reseta
+                console.log('📋 Nenhum registro encontrado na planilha');
                 resetarMarcacoes();
                 atualizarCardsMarcacoes();
                 statusText.textContent = '📋 Nenhuma marcação hoje. Pronto para registrar.';
@@ -1125,7 +1149,7 @@ async function carregarMarcacoesDoDia() {
         const script = document.createElement('script');
         script.src = url.replace('jsonpCallback', callbackName);
         script.onerror = function() {
-            console.log('⚠️ Erro ao carregar marcações do dia');
+            console.log('⚠️ Erro ao carregar marcações');
             statusText.textContent = '📋 Usando dados locais';
             delete window[callbackName];
             document.body.removeChild(script);
