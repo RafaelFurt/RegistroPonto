@@ -1151,25 +1151,24 @@ async function inicializar() {
         atualizarStatusBotao();
     });
 
-    // ... resto do código existente ...
+    btnCadastrar.addEventListener('click', cadastrarNovoColaborador);
+    btnMarcar.addEventListener('click', registrarPonto);
+    btnReset.addEventListener('click', resetarDia);
+    btnGerenciarColabs.addEventListener('click', gerenciarColaboradores);
+    btnToggleRelatorio.addEventListener('click', toggleRelatorio);
+    btnFecharRelatorio.addEventListener('click', () => {
+        relatorioSection.style.display = 'none';
+        btnToggleRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatório';
+    });
+    btnBuscarRelatorio.addEventListener('click', buscarRelatorio);
+    btnExportExcel.addEventListener('click', exportarExcel);
+    btnExportPNG.addEventListener('click', exportarPNG);
+    window.addEventListener('beforeunload', () => salvarEstadoAtualNoStorage());
+    
+    console.log('✅ Sistema inicializado! Colaborador:', colaboradorSelecionado);
 }
 
-            btnCadastrar.addEventListener('click', cadastrarNovoColaborador);
-            btnMarcar.addEventListener('click', registrarPonto);
-            btnReset.addEventListener('click', resetarDia);
-            btnGerenciarColabs.addEventListener('click', gerenciarColaboradores);
-            btnToggleRelatorio.addEventListener('click', toggleRelatorio);
-            btnFecharRelatorio.addEventListener('click', () => {
-                relatorioSection.style.display = 'none';
-                btnToggleRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatório';
-            });
-            btnBuscarRelatorio.addEventListener('click', buscarRelatorio);
-            btnExportExcel.addEventListener('click', exportarExcel);
-            btnExportPNG.addEventListener('click', exportarPNG);
-            window.addEventListener('beforeunload', () => salvarEstadoAtualNoStorage());
-        }
-
-        inicializar();
+inicializar();
     })();
 </script>
 </body>
