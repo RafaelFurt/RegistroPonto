@@ -463,7 +463,6 @@
             { hora: null, local: null, iso: null }
         ];
         let proximoIndice = 0;
-        let historicoCompleto = [];
 
         const dataSpan = document.getElementById('dataCompleta');
         const diaSemanaSpan = document.getElementById('diaSemana');
@@ -626,17 +625,6 @@
                 const callbackName = 'jsonpCallback_' + Date.now();
                 window[callbackName] = function(data) {
                     console.log('✅ Resposta JSONP:', data);
-                    if (acao === 'registrar') {
-                        salvarRegistroLocal({
-                            colaborador: colaboradorSelecionado,
-                            data: dataFormatada,
-                            marcacao1: marcacoes[0].hora || '',
-                            marcacao2: marcacoes[1].hora || '',
-                            marcacao3: marcacoes[2].hora || '',
-                            marcacao4: marcacoes[3].hora || '',
-                            timestamp: dataHoje.toISOString()
-                        });
-                    }
                     delete window[callbackName];
                     document.body.removeChild(script);
                     resolve(true);
@@ -660,45 +648,6 @@
                     }
                 }, 10000);
             });
-        }
-
-        function salvarRegistroLocal(payload) {
-            const historico = JSON.parse(localStorage.getItem('ponto_historico_completo') || '[]');
-            const dataHoje = payload.data;
-            const colaborador = payload.colaborador;
-            const indexExistente = historico.findIndex(reg => 
-                reg.data === dataHoje && reg.colaborador === colaborador
-            );
-            
-            if (indexExistente !== -1) {
-                const registroExistente = historico[indexExistente];
-                historico[indexExistente] = {
-                    colaborador: colaborador,
-                    data: dataHoje,
-                    marcacao1: payload.marcacao1 || registroExistente.marcacao1 || '',
-                    marcacao2: payload.marcacao2 || registroExistente.marcacao2 || '',
-                    marcacao3: payload.marcacao3 || registroExistente.marcacao3 || '',
-                    marcacao4: payload.marcacao4 || registroExistente.marcacao4 || '',
-                    timestamp: payload.timestamp,
-                    timestamp_local: new Date().toISOString()
-                };
-                console.log('📝 Registro ATUALIZADO:', historico[indexExistente]);
-            } else {
-                historico.push({ 
-                    colaborador: colaborador,
-                    data: dataHoje,
-                    marcacao1: payload.marcacao1 || '',
-                    marcacao2: payload.marcacao2 || '',
-                    marcacao3: payload.marcacao3 || '',
-                    marcacao4: payload.marcacao4 || '',
-                    timestamp: payload.timestamp,
-                    timestamp_local: new Date().toISOString()
-                });
-                console.log('📝 Novo registro CRIADO:', payload);
-            }
-            
-            localStorage.setItem('ponto_historico_completo', JSON.stringify(historico));
-            historicoCompleto = historico;
         }
 
         async function registrarPonto() {
@@ -796,9 +745,6 @@
             }
         }
 
-        // ============================================
-        // BUSCAR RELATÓRIO - DIRETO DO GOOGLE SHEETS
-        // ============================================
         async function buscarRelatorio() {
             const dataInicio = filtroDataInicio.value;
             const dataFim = filtroDataFim.value;
