@@ -1,5 +1,5 @@
 // ============================================
-// GOOGLE APPS SCRIPT - REGISTRO DE PONTO (AJUSTADO)
+// GOOGLE APPS SCRIPT - REGISTRO DE PONTO (CORRIGIDO)
 // ============================================
 const SPREADSHEET_ID = '1VPZ0PrC7EwDQv_Zy1FhjyDiw478H9i-G_S0KtZJ1vv4';
 
@@ -50,12 +50,12 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JAVASCRIPT);
     }
     
-    // AJUSTE: Salvar data sempre como YYYY-MM-DD para consistência
+    // Garantir que a data está no formato YYYY-MM-DD
     const dataParaSalvar = params.data || new Date().toISOString().split('T')[0];
     
     const novaLinha = [
       params.colaborador || 'NÃO INFORMADO',
-      dataParaSalvar, // YYYY-MM-DD
+      dataParaSalvar,
       params.marcacao1 || '',
       params.local1 || '',
       params.marcacao2 || '',
@@ -91,6 +91,50 @@ function doGet(e) {
   }
 }
 
+// Função auxiliar para converter data para ISO (YYYY-MM-DD)
+function converterDataParaIso(valor) {
+  if (!valor && valor !== 0) return '';
+  
+  // Se já é uma data no formato YYYY-MM-DD
+  if (typeof valor === 'string' && valor.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    return valor;
+  }
+  
+  // Se é um objeto Date
+  if (valor instanceof Date) {
+    const ano = valor.getFullYear();
+    const mes = String(valor.getMonth() + 1).padStart(2, '0');
+    const dia = String(valor.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+  
+  // Converter de string
+  const texto = String(valor).trim();
+  
+  // Formato DD/MM/YYYY
+  const ddmmyyyy = texto.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  if (ddmmyyyy) {
+    const dia = ddmmyyyy[1].padStart(2, '0');
+    const mes = ddmmyyyy[2].padStart(2, '0');
+    const ano = ddmmyyyy[3];
+    return `${ano}-${mes}-${dia}`;
+  }
+  
+  // Formato DDMMYYYY
+  const compact = texto.match(/^(\d{2})(\d{2})(\d{4})$/);
+  if (compact) {
+    return `${compact[3]}-${compact[2]}-${compact[1]}`;
+  }
+  
+  // Tentar parse como Date
+  const parsed = new Date(texto);
+  if (!isNaN(parsed.getTime())) {
+    return parsed.toISOString().split('T')[0];
+  }
+  
+  return texto;
+}
+
 function consultarColaboradores(params) {
   try {
     console.log("👥 Consultando colaboradores...");
@@ -110,12 +154,14 @@ function consultarColaboradores(params) {
     const todasLinhas = sheet.getDataRange().getValues();
     const colaboradores = [];
     
+    // Pular cabeçalho (índice 0)
     for (let i = 1; i < todasLinhas.length; i++) {
       if (todasLinhas[i][0] && String(todasLinhas[i][0]).trim() !== '') {
         colaboradores.push({ nome: String(todasLinhas[i][0]).trim() });
       }
     }
     
+    // Remover duplicatas
     const nomesUnicos = [...new Set(colaboradores.map(c => c.nome))];
     const colaboradoresUnicos = nomesUnicos.map(nome => ({ nome }));
     
@@ -143,16 +189,13 @@ function consultarColaboradores(params) {
 }
 
 // ============================================
-// FUNÇÃO CONSULTAR REGISTROS - AJUSTADA PARA COMPARAR DATAS COMO STRING YYYY-MM-DD
+// FUNÇÃO CONSULTAR REGISTROS - CORRIGIDA
 // ============================================
 function consultarRegistros(params) {
   try {
     console.log("🔍 Iniciando consulta de registros");
     
-    // GARANTIR QUE PARAMS É UM OBJETO
-    if (!params) {
-      params = {};
-    }
+    if (!params) params = {};
     
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const sheet = ss.getSheetByName("Registros");
@@ -178,45 +221,17 @@ function consultarRegistros(params) {
         .setMimeType(ContentService.MimeType.JAVASCRIPT);
     }
     
-    // Garantir valores padrão
-    function converterDataParaIso(valor) {
-      if (!valor && valor !== 0) return '';
-      if (valor instanceof Date) {
-        const ano = valor.getFullYear();
-        const mes = String(valor.getMonth() + 1).padStart(2, '0');
-        const dia = String(valor.getDate()).padStart(2, '0');
-        return `${ano}-${mes}-${dia}`;
-      }
-      const texto = String(valor).trim();
-      if (texto.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        return texto;
-      }
-      const ddmmyyyy = texto.match(/^(\d{1,2})\s*[\/\-\.]\s*(\d{1,2})\s*[\/\-\.]\s*(\d{4})$/);
-      if (ddmmyyyy) {
-        const dia = ddmmyyyy[1].padStart(2, '0');
-        const mes = ddmmyyyy[2].padStart(2, '0');
-        const ano = ddmmyyyy[3];
-        return `${ano}-${mes}-${dia}`;
-      }
-      const compact = texto.match(/^(\d{2})(\d{2})(\d{4})$/);
-      if (compact) {
-        return `${compact[3]}-${compact[2]}-${compact[1]}`;
-      }
-      const parsed = new Date(texto);
-      if (!isNaN(parsed.getTime())) {
-        return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
-      }
-      return texto;
-    }
     const dataInicio = params.dataInicio ? converterDataParaIso(params.dataInicio) : null;
     const dataFim = params.dataFim ? converterDataParaIso(params.dataFim) : null;
     const colaborador = params.colaborador ? String(params.colaborador).trim() : 'todos';
     const debug = params.debug === 'true';
     
+    // Mapear cabeçalho
     const header = todasLinhas[0].map(c => String(c || '').trim().toLowerCase());
+    
     function findHeaderIndex(names, fallback) {
       for (const name of names) {
-        const idx = header.indexOf(name);
+        const idx = header.indexOf(name.toLowerCase());
         if (idx !== -1) return idx;
       }
       return fallback;
@@ -224,49 +239,42 @@ function consultarRegistros(params) {
 
     const idxColaborador = findHeaderIndex(['colaborador'], 0);
     const idxData = findHeaderIndex(['data'], 1);
-    const idxMarcacao1 = findHeaderIndex(['1ª marcação', '1ª marcação (início)', '1º marcação', 'marcação 1', 'primeira marcação'], 2);
-    const idxLocal1 = findHeaderIndex(['local 1ª marcação', 'local 1ª', 'local 1', 'local primeira marcação'], 3);
-    const idxMarcacao2 = findHeaderIndex(['2ª marcação', '2ª marcação (saída almoço)', '2º marcação', 'marcação 2', 'segunda marcação'], 4);
-    const idxLocal2 = findHeaderIndex(['local 2ª marcação', 'local 2ª', 'local 2', 'local segunda marcação'], 5);
-    const idxMarcacao3 = findHeaderIndex(['3ª marcação', '3ª marcação (retorno almoço)', '3º marcação', 'marcação 3', 'terceira marcação'], 6);
-    const idxLocal3 = findHeaderIndex(['local 3ª marcação', 'local 3ª', 'local 3', 'local terceira marcação'], 7);
-    const idxMarcacao4 = findHeaderIndex(['4ª marcação', '4ª marcação (fim expediente)', '4º marcação', 'marcação 4', 'quarta marcação'], 8);
-    const idxLocal4 = findHeaderIndex(['local 4ª marcação', 'local 4ª', 'local 4', 'local quarta marcação'], 9);
+    const idxMarcacao1 = findHeaderIndex(['1ª marcação', '1ª marcação (início)', '1º marcação', 'marcação 1'], 2);
+    const idxLocal1 = findHeaderIndex(['local 1ª marcação', 'local 1ª', 'local 1'], 3);
+    const idxMarcacao2 = findHeaderIndex(['2ª marcação', '2ª marcação (saída almoço)', '2º marcação', 'marcação 2'], 4);
+    const idxLocal2 = findHeaderIndex(['local 2ª marcação', 'local 2ª', 'local 2'], 5);
+    const idxMarcacao3 = findHeaderIndex(['3ª marcação', '3ª marcação (retorno almoço)', '3º marcação', 'marcação 3'], 6);
+    const idxLocal3 = findHeaderIndex(['local 3ª marcação', 'local 3ª', 'local 3'], 7);
+    const idxMarcacao4 = findHeaderIndex(['4ª marcação', '4ª marcação (fim expediente)', '4º marcação', 'marcação 4'], 8);
+    const idxLocal4 = findHeaderIndex(['local 4ª marcação', 'local 4ª', 'local 4'], 9);
 
-    console.log("📋 Header detectado:", header);
-    console.log("📌 Índices usados: colaborador=", idxColaborador, "data=", idxData, "marcação1=", idxMarcacao1, "marcação2=", idxMarcacao2, "marcação3=", idxMarcacao3, "marcação4=", idxMarcacao4);
-    console.log("🔎 Filtros - Início:", dataInicio, "Fim:", dataFim, "Colaborador:", colaborador, "Debug:", debug);
+    console.log("📌 Índices:", {idxColaborador, idxData, idxMarcacao1, idxMarcacao2, idxMarcacao3, idxMarcacao4});
+    console.log("🔎 Filtros - Início:", dataInicio, "Fim:", dataFim, "Colaborador:", colaborador);
 
     const registros = [];
 
     function formatarHora(valor) {
       if (!valor) return '';
       if (valor instanceof Date) {
-        const horas = String(valor.getHours()).padStart(2, '0');
-        const minutos = String(valor.getMinutes()).padStart(2, '0');
-        const segundos = String(valor.getSeconds()).padStart(2, '0');
-        return horas + ':' + minutos + ':' + segundos;
-      } else if (typeof valor === 'string') {
-        return valor.trim();
+        return valor.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
       }
+      if (typeof valor === 'string') return valor.trim();
       return String(valor);
     }
 
     for (let i = 1; i < todasLinhas.length; i++) {
       const linha = todasLinhas[i];
-
-      if (debug) {
-        console.log(`🔍 Processando linha ${i}:`, linha);
-      }
-
+      
+      // Pular linhas vazias
+      if (!linha[idxColaborador] && !linha[idxData]) continue;
+      
       const dataComparavel = converterDataParaIso(linha[idxData]);
       let dataFormatada = dataComparavel;
+      
+      // Formatar para exibição DD/MM/YYYY
       if (dataComparavel.match(/^(\d{4})-(\d{2})-(\d{2})$/)) {
         const [ano, mes, dia] = dataComparavel.split('-');
         dataFormatada = `${dia}/${mes}/${ano}`;
-      }
-      if (debug) {
-        console.log(`📅 Data convertida: '${linha[idxData]}' -> '${dataComparavel}'`);
       }
 
       const reg = {
@@ -284,12 +292,13 @@ function consultarRegistros(params) {
       };
 
       // Filtrar por colaborador
-      if (colaborador && colaborador.toLowerCase() !== 'todos' && reg.colaborador !== colaborador) {
+      if (colaborador && colaborador.toLowerCase() !== 'todos' && 
+          reg.colaborador.toLowerCase() !== colaborador.toLowerCase()) {
         if (debug) console.log(`⏭️ Colaborador não corresponde: "${reg.colaborador}" !== "${colaborador}"`);
         continue;
       }
 
-      // Filtrar por data - COMPARAÇÃO SIMPLES COMO STRING YYYY-MM-DD
+      // Filtrar por data
       if (dataInicio && dataComparavel < dataInicio) {
         if (debug) console.log(`⏭️ Data antes do início: ${dataComparavel} < ${dataInicio}`);
         continue;
@@ -300,7 +309,6 @@ function consultarRegistros(params) {
       }
 
       if (debug) console.log(`✅ Registro aceito: ${reg.colaborador} - ${dataComparavel}`);
-      console.log(`✅ Aceito: ${reg.colaborador} - ${dataComparavel}`);
       registros.push(reg);
     }
     
@@ -313,14 +321,23 @@ function consultarRegistros(params) {
       if (!agrupado[chave]) {
         agrupado[chave] = reg;
       } else {
-        if (reg.marcacao1) agrupado[chave].marcacao1 = reg.marcacao1;
-        if (reg.marcacao2) agrupado[chave].marcacao2 = reg.marcacao2;
-        if (reg.marcacao3) agrupado[chave].marcacao3 = reg.marcacao3;
-        if (reg.marcacao4) agrupado[chave].marcacao4 = reg.marcacao4;
+        // Manter a primeira marcação de cada tipo
+        if (reg.marcacao1 && !agrupado[chave].marcacao1) agrupado[chave].marcacao1 = reg.marcacao1;
+        if (reg.marcacao2 && !agrupado[chave].marcacao2) agrupado[chave].marcacao2 = reg.marcacao2;
+        if (reg.marcacao3 && !agrupado[chave].marcacao3) agrupado[chave].marcacao3 = reg.marcacao3;
+        if (reg.marcacao4 && !agrupado[chave].marcacao4) agrupado[chave].marcacao4 = reg.marcacao4;
       }
     });
     
     const resultado = Object.values(agrupado);
+    
+    // Ordenar por data (mais recente primeiro)
+    resultado.sort((a, b) => {
+      const dataA = a.data.split('/').reverse().join('-');
+      const dataB = b.data.split('/').reverse().join('-');
+      return dataB.localeCompare(dataA);
+    });
+    
     console.log("✅ Registros agrupados:", resultado.length);
     
     const callback = params.callback || 'callback';
@@ -328,6 +345,7 @@ function consultarRegistros(params) {
       status: 'success',
       registros: resultado
     };
+    
     if (debug) {
       respostaObj.debugInfo = {
         totalRows: todasLinhas.length - 1,
@@ -339,6 +357,7 @@ function consultarRegistros(params) {
         colaborador
       };
     }
+    
     const resposta = JSON.stringify(respostaObj);
     
     return ContentService
@@ -359,46 +378,44 @@ function removerRegistrosDoDia(sheet, data, colaborador) {
   const dados = sheet.getDataRange().getValues();
   const linhasParaDeletar = [];
   
+  // Procurar de baixo para cima para não bagunçar os índices
   for (let i = dados.length - 1; i >= 1; i--) {
-    let dataLinha = dados[i][1];
-    if (dataLinha instanceof Date) {
-      const ano = dataLinha.getFullYear();
-      const mes = String(dataLinha.getMonth() + 1).padStart(2, '0');
-      const dia = String(dataLinha.getDate()).padStart(2, '0');
-      dataLinha = `${ano}-${mes}-${dia}`;
-    }
-    if (dataLinha === data && dados[i][0] === colaborador) {
-      linhasParaDeletar.push(i + 1);
+    let dataLinha = converterDataParaIso(dados[i][1]); // Índice 1 = coluna Data
+    
+    if (dataLinha === data && dados[i][0] === colaborador) { // Índice 0 = Colaborador
+      linhasParaDeletar.push(i + 1); // +1 porque sheet.deleteRow usa índice 1-based
     }
   }
   
+  // Ordenar decrescente para deletar de baixo para cima
+  linhasParaDeletar.sort((a, b) => b - a);
   linhasParaDeletar.forEach(linha => sheet.deleteRow(linha));
-  console.log(`🗑️ ${linhasParaDeletar.length} registros removidos`);
+  
+  console.log(`🗑️ ${linhasParaDeletar.length} registros removidos dos Registros`);
 }
 
 function removerDoResumo(sheetResumo, data, colaborador) {
   const dados = sheetResumo.getDataRange().getValues();
   const linhasParaDeletar = [];
   
+  // Estrutura do Resumo: Data (col 0), Colaborador (col 1), Entrada, Saída, Status
   for (let i = dados.length - 1; i >= 1; i--) {
-    let dataLinha = dados[i][0];
-    if (dataLinha instanceof Date) {
-      const ano = dataLinha.getFullYear();
-      const mes = String(dataLinha.getMonth() + 1).padStart(2, '0');
-      const dia = String(dataLinha.getDate()).padStart(2, '0');
-      dataLinha = `${ano}-${mes}-${dia}`;
-    }
-    if (dataLinha === data && dados[i][1] === colaborador) {
+    let dataLinha = converterDataParaIso(dados[i][0]); // Índice 0 = Data
+    
+    if (dataLinha === data && dados[i][1] === colaborador) { // Índice 1 = Colaborador
       linhasParaDeletar.push(i + 1);
     }
   }
   
+  linhasParaDeletar.sort((a, b) => b - a);
   linhasParaDeletar.forEach(linha => sheetResumo.deleteRow(linha));
+  
   console.log(`🗑️ ${linhasParaDeletar.length} registros removidos do Resumo`);
 }
 
 function atualizarAbasResumoEColaboradores(ss, dados) {
   try {
+    // Atualizar aba Colaboradores
     let sheetColabs = ss.getSheetByName("Colaboradores");
     if (!sheetColabs) {
       sheetColabs = ss.insertSheet("Colaboradores");
@@ -430,6 +447,7 @@ function atualizarAbasResumoEColaboradores(ss, dados) {
       ]);
     }
     
+    // Atualizar aba Resumo
     let sheetResumo = ss.getSheetByName("Resumo");
     if (!sheetResumo) {
       sheetResumo = ss.insertSheet("Resumo");
@@ -438,8 +456,10 @@ function atualizarAbasResumoEColaboradores(ss, dados) {
         .setFontWeight('bold').setBackground('#620000').setFontColor('#FFFFFF');
     }
     
-    // Ajustar data para YYYY-MM-DD no resumo também
+    // Garantir formato YYYY-MM-DD
     const dataResumo = dados.data || new Date().toISOString().split('T')[0];
+    
+    // Remover registro existente do dia para este colaborador
     removerDoResumo(sheetResumo, dataResumo, nomeColab);
     
     const status = (dados.marcacao1 && dados.marcacao2 && dados.marcacao3 && dados.marcacao4) 
@@ -483,17 +503,15 @@ function criarCabecalho(sheet) {
 
 function testarConsulta() {
   const hoje = new Date();
-  const dia = String(hoje.getDate()).padStart(2, '0');
-  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-  const ano = hoje.getFullYear();
-  const dataHoje = ano + '-' + mes + '-' + dia;
+  const dataHoje = hoje.toISOString().split('T')[0];
   
   const params = {
     acao: 'consultar',
     dataInicio: dataHoje,
     dataFim: dataHoje,
     colaborador: 'todos',
-    callback: 'test'
+    callback: 'test',
+    debug: 'true'
   };
   
   console.log("🧪 Testando consulta para data:", dataHoje);
@@ -507,7 +525,10 @@ function inicializarPlanilha() {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     
     let sheet = ss.getSheetByName("Registros");
-    if (!sheet) { sheet = ss.insertSheet("Registros"); criarCabecalho(sheet); }
+    if (!sheet) { 
+      sheet = ss.insertSheet("Registros"); 
+      criarCabecalho(sheet); 
+    }
     
     if (!ss.getSheetByName("Resumo")) {
       const r = ss.insertSheet("Resumo");
