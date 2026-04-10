@@ -1145,6 +1145,7 @@ async function inicializar() {
     }
     
     selectColab.addEventListener('change', async (e) => {
+        colaboradorSelecionado = e.target.value;
 
         // CARREGAR MARCAÇÕES DO NOVO COLABORADOR
         await carregarMarcacoesDoDia();
