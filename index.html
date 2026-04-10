@@ -689,48 +689,89 @@
             });
         }
 
-        async function registrarPonto() {
-            if (!colaboradorSelecionado) {
-                alert('Selecione um colaborador.');
-                return;
-            }
+async function salvarNoGoogleSheet(acao = 'registrar') {
+    if (!colaboradorSelecionado) return false;
+
+    const dataHoje = new Date();
+    const dataHojeISO = dataHoje.toISOString().split('T')[0];
+
+    const params = new URLSearchParams();
+    params.append('acao', acao);
+    params.append('colaborador', colaboradorSelecionado);
+    params.append('data', dataHojeISO);
+    params.append('marcacao1', marcacoes[0].hora || '');
+    params.append('local1', marcacoes[0].local || '');
+    params.append('marcacao2', marcacoes[1].hora || '');
+    params.append('local2', marcacoes[1].local || '');
+    params.append('marcacao3', marcacoes[2].hora || '');
+    params.append('local3', marcacoes[2].local || '');
+    params.append('marcacao4', marcacoes[3].hora || '');
+    params.append('local4', marcacoes[3].local || '');
+    params.append('tipo_marcacao', proximoIndice.toString());
+    params.append('iso_timestamp', dataHoje.toISOString());
+    params.append('_', Date.now());
+
+    try {
+        const response = await jsonpRequest(params);
+        console.log('✅ Resposta salvar:', response);
+        return true;
+    } catch (error) {
+        console.error('❌ Erro ao salvar:', error);
+        return false;
+    }
+}
+
+async function registrarPonto() {
+    if (!colaboradorSelecionado) {
+        alert('Selecione um colaborador.');
+        return;
+    }
+    
+    if (proximoIndice >= 4) {
+        alert('Todas as marcacoes ja foram feitas.');
+        return;
+    }
+
+    if (btnMarcar) btnMarcar.disabled = true;
+    if (statusText) statusText.textContent = 'Obtendo localizacao...';
+
+    try {
+        const agora = new Date();
+        const horaFormatada = agora.toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        });
+        const local = await obterLocalizacao();
+
+        marcacoes[proximoIndice] = { hora: horaFormatada, local: local };
+        
+        if (statusText) statusText.textContent = 'Salvando na planilha...';
+        
+        // ⬇️ CHAMADA CRÍTICA QUE ESTAVA FALTANDO ⬇️
+        const salvou = await salvarNoGoogleSheet('registrar');
+        
+        if (salvou) {
+            proximoIndice++;
+            atualizarCardsMarcacoes();
             
-            if (proximoIndice >= 4) {
-                alert('Todas as marcacoes ja foram feitas.');
-                return;
-            }
-
-            if (btnMarcar) btnMarcar.disabled = true;
-            if (statusText) statusText.textContent = 'Obtendo localizacao...';
-
-            try {
-                const agora = new Date();
-                const horaFormatada = agora.toLocaleTimeString('pt-BR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit' 
-                });
-                const local = await obterLocalizacao();
-
-                marcacoes[proximoIndice] = { hora: horaFormatada, local: local };
-                proximoIndice++;
-                
-                atualizarCardsMarcacoes();
-                
-                if (statusText) {
-                    if (proximoIndice < 4) {
-                        statusText.textContent = 'Marcacao ' + proximoIndice + 'ª registrada!';
-                    } else {
-                        statusText.textContent = 'Expediente completo!';
-                    }
+            if (statusText) {
+                if (proximoIndice < 4) {
+                    statusText.textContent = 'Marcacao ' + proximoIndice + 'ª registrada!';
+                } else {
+                    statusText.textContent = 'Expediente completo!';
                 }
-            } catch (error) {
-                console.error('Erro ao registrar:', error);
-                if (statusText) statusText.textContent = 'Erro ao registrar.';
-            } finally {
-                if (btnMarcar) btnMarcar.disabled = false;
             }
+        } else {
+            if (statusText) statusText.textContent = 'Erro ao salvar. Tente novamente.';
         }
+    } catch (error) {
+        console.error('Erro ao registrar:', error);
+        if (statusText) statusText.textContent = 'Erro ao registrar.';
+    } finally {
+        if (btnMarcar) btnMarcar.disabled = false;
+    }
+}
 
         async function resetarDia() {
             if (!confirm('Apagar todas as marcacoes do dia atual?')) return;
