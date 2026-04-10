@@ -4,7 +4,9 @@ tmp_*.py
 *.log
 
 # Google Apps Script (contém credenciais)
+# Permite o arquivo ajustado enquanto mantém os demais scripts privados ignorados.
 google-apps-script*.js
+!google-apps-script-ajustado.js
 
 # Diretórios de IDE
 .vscode/
