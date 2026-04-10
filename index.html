@@ -1020,15 +1020,29 @@ async function carregarMarcacoesDoDia() {
     params.append('dataInicio', dataHojeISO);
     params.append('dataFim', dataHojeISO);
     params.append('colaborador', colaboradorSelecionado);
+    params.append('debug', 'true'); // Adicionar flag de debug
     params.append('callback', 'jsonpCallback');
 
     const url = SCRIPT_URL + '?' + params.toString();
     console.log('🔍 URL busca marcações:', url);
+    console.log('🔍 Parâmetros enviados:', {
+        acao: 'consultar',
+        dataInicio: dataHojeISO,
+        dataFim: dataHojeISO,
+        colaborador: colaboradorSelecionado
+    });
     
     return new Promise((resolve) => {
         const callbackName = 'jsonpCallback_' + Date.now();
         window[callbackName] = function(response) {
-            console.log('📊 Resposta marcações:', response);
+            console.log('📊 Resposta COMPLETA marcações:', response);
+            console.log('📊 Status:', response.status);
+            console.log('📊 Registros recebidos:', response.registros ? response.registros.length : 'N/A');
+            if (response.registros) {
+                response.registros.forEach((reg, i) => {
+                    console.log(`📊 Registro ${i}:`, reg);
+                });
+            }
             
             function parseDataParaISO(data) {
                 if (!data) return null;
