@@ -1,0 +1,18 @@
+# Arquivos temporários
+tmp_*.py
+*.tmp
+*.log
+
+# Google Apps Script (contém credenciais)
+google-apps-script*.js
+
+# Diretórios de IDE
+.vscode/
+.idea/
+
+# Node modules (se houver)
+node_modules/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db

@@ -452,7 +452,7 @@
     (function(){
         "use strict";
 
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzuyZLC2OUKPoQJp6rKiPts5ugwrHS4T6ZM8z_NlvVwV11P4Rycy4IAMWXrOUF-ZVgC/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgp2CJcAGuFzHpm95cd9lHpryJscRSuSQjRX78dafIl47kSlMVqD4WpWXiaRdWp-21/exec';
 
         let colaboradores = [];
         let colaboradorSelecionado = null;
@@ -515,13 +515,7 @@
         // CARREGAR COLABORADORES (SINCRONIZADO COM PLANILHA)
         // ============================================
         async function carregarColaboradores() {
-            // Primeiro tenta carregar do localStorage
-            const stored = localStorage.getItem('ponto_colaboradores');
-            if (stored) {
-                try { colaboradores = JSON.parse(stored); } catch(e){ colaboradores = []; }
-            }
-            
-            // Depois busca da planilha para sincronizar
+            // Carrega colaboradores diretamente da planilha
             statusText.textContent = '🔄 Sincronizando colaboradores...';
             
             const params = new URLSearchParams();
@@ -537,24 +531,20 @@
                     console.log('👥 Resposta colaboradores:', response);
                     
                     if (response.status === 'success' && response.colaboradores) {
-                        // Mescla com colaboradores locais (evita duplicatas)
-                        const nomesExistentes = colaboradores.map(c => c.nome);
-                        response.colaboradores.forEach(c => {
-                            if (!nomesExistentes.includes(c.nome)) {
-                                colaboradores.push(c);
-                            }
-                        });
-                        
+                        colaboradores = response.colaboradores.slice();
                         if (colaboradores.length === 0) {
                             colaboradores = [{ nome: 'Funcionário Padrão' }];
                         }
-                        
-                        salvarColaboradoresStorage();
                         statusText.textContent = '✅ Colaboradores sincronizados!';
+                    } else {
+                        if (!colaboradores.length) {
+                            colaboradores = [{ nome: 'Funcionário Padrão' }];
+                        }
+                        statusText.textContent = '📋 Não foi possível carregar colaboradores. Usando fallback.';
                     }
                     
                     atualizarSelectColaboradores();
-                    carregarEstadoColaborador();
+                    carregarMarcacoesDoDia();
                     
                     delete window[callbackName];
                     document.body.removeChild(script);
@@ -564,13 +554,13 @@
                 const script = document.createElement('script');
                 script.src = url.replace('jsonpCallback', callbackName);
                 script.onerror = () => {
-                    console.log('⚠️ Fallback para localStorage');
+                    console.log('⚠️ Erro ao carregar colaboradores da planilha');
                     if (!colaboradores.length) {
                         colaboradores = [{ nome: 'Funcionário Padrão' }];
                     }
                     atualizarSelectColaboradores();
-                    carregarEstadoColaborador();
-                    statusText.textContent = '📋 Usando dados locais';
+                    carregarMarcacoesDoDia();
+                    statusText.textContent = '❌ Falha ao sincronizar colaboradores';
                     delete window[callbackName];
                     document.body.removeChild(script);
                     resolve(false);
@@ -580,7 +570,7 @@
         }
 
         function salvarColaboradoresStorage() {
-            localStorage.setItem('ponto_colaboradores', JSON.stringify(colaboradores));
+            // Sem persistência local: colaboradores são sincronizados diretamente com a planilha.
         }
 
         function atualizarSelectColaboradores() {
@@ -655,12 +645,12 @@
             if (!colaboradorSelecionado) return false;
 
             const dataHoje = new Date();
-            const dataFormatada = dataHoje.toLocaleDateString('pt-BR');
+            const dataHojeISO = dataHoje.toISOString().split('T')[0];
 
             const params = new URLSearchParams();
             params.append('acao', acao);
             params.append('colaborador', colaboradorSelecionado);
-            params.append('data', dataFormatada);
+            params.append('data', dataHojeISO); // MUDANÇA: Enviar como YYYY-MM-DD
             params.append('marcacao1', marcacoes[0].hora || '');
             params.append('local1', marcacoes[0].local || '');
             params.append('marcacao2', marcacoes[1].hora || '');
@@ -729,8 +719,6 @@
                 statusText.textContent = proximoIndice < 4 
                     ? `✅ ${etapas[proximoIndice-1]} registrada! Próximo: ${proximoIndice+1}ª.`
                     : '🎉 Expediente completo!';
-                
-                salvarEstadoAtualNoStorage();
             } catch (error) {
                 statusText.textContent = 'Erro ao registrar.';
             } finally {
@@ -754,7 +742,6 @@
             
             proximoIndice = 0;
             atualizarCardsMarcacoes();
-            salvarEstadoAtualNoStorage();
             statusText.textContent = '✅ Dia resetado! Registros removidos da planilha.';
         }
 
@@ -771,10 +758,7 @@
             if (acao.toUpperCase() === 'LIMPAR') {
                 if (confirm('⚠️ Remover TODOS os colaboradores?')) {
                     colaboradores = [{ nome: 'Funcionário Padrão' }];
-                    salvarColaboradoresStorage();
-                    atualizarSelectColaboradores();
-                    statusText.textContent = '✅ Lista resetada!';
-                }
+
                 return;
             }
             
@@ -794,7 +778,6 @@
             const nome = colaboradores[index].nome;
             if (confirm(`Remover "${nome}"?`)) {
                 colaboradores.splice(index, 1);
-                salvarColaboradoresStorage();
                 atualizarSelectColaboradores();
                 statusText.textContent = `✅ "${nome}" removido!`;
             }
@@ -985,27 +968,13 @@ async function buscarRelatorio() {
         }
 
         function salvarEstadoAtualNoStorage() {
-            if (!colaboradorSelecionado) return;
-            const chave = `ponto_${new Date().toISOString().slice(0,10)}_${colaboradorSelecionado}`;
-            localStorage.setItem(chave, JSON.stringify(marcacoes));
+            // Não salva marcações de ponto no localStorage. O estado é carregado diretamente da planilha.
         }
 
         function carregarEstadoColaborador() {
             if (!colaboradorSelecionado) return;
-            const chave = `ponto_${new Date().toISOString().slice(0,10)}_${colaboradorSelecionado}`;
-            const salvo = localStorage.getItem(chave);
-            if (salvo) {
-                try {
-                    const parsed = JSON.parse(salvo);
-                    if (Array.isArray(parsed) && parsed.length === 4) marcacoes = parsed;
-                    else resetarMarcacoes();
-                } catch { resetarMarcacoes(); }
-            } else {
-                resetarMarcacoes();
-            }
-            proximoIndice = marcacoes.findIndex(m => m.hora === null);
-            if (proximoIndice === -1) proximoIndice = 4;
-            atualizarCardsMarcacoes();
+            resetarMarcacoes();
+            carregarMarcacoesDoDia();
         }
 
         function resetarMarcacoes() {
@@ -1027,7 +996,6 @@ async function buscarRelatorio() {
                 return;
             }
             colaboradores.push({ nome: nomeLimpo });
-            salvarColaboradoresStorage();
             colaboradorSelecionado = nomeLimpo;
             atualizarSelectColaboradores();
             statusText.textContent = `✅ "${nomeLimpo}" adicionado!`;
@@ -1041,25 +1009,16 @@ async function carregarMarcacoesDoDia() {
     
     statusText.textContent = '🔄 Carregando marcações do dia...';
     
-    // Formatar data de hoje no padrão brasileiro DD/MM/YYYY
     const hoje = new Date();
-    const dia = String(hoje.getDate()).padStart(2, '0');
-    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-    const ano = hoje.getFullYear();
-    const dataHoje = dia + '/' + mes + '/' + ano;
+    const dataHojeISO = hoje.toISOString().split('T')[0];
+    const dataHojeBr = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}/${hoje.getFullYear()}`;
     
-    console.log('📅 Buscando marcações para:', colaboradorSelecionado, 'Data:', dataHoje);
+    console.log('📅 Buscando marcações para:', colaboradorSelecionado, 'Data ISO:', dataHojeISO, 'Data BR:', dataHojeBr);
     
     const params = new URLSearchParams();
     params.append('acao', 'consultar');
-    // Buscar um período maior para garantir (últimos 7 dias)
-    const dataInicio = new Date();
-    dataInicio.setDate(dataInicio.getDate() - 7);
-    const inicioFormatado = dataInicio.toISOString().split('T')[0];
-    const fimFormatado = new Date().toISOString().split('T')[0];
-    
-    params.append('dataInicio', inicioFormatado);
-    params.append('dataFim', fimFormatado);
+    params.append('dataInicio', dataHojeISO);
+    params.append('dataFim', dataHojeISO);
     params.append('colaborador', colaboradorSelecionado);
     params.append('callback', 'jsonpCallback');
 
@@ -1071,14 +1030,23 @@ async function carregarMarcacoesDoDia() {
         window[callbackName] = function(response) {
             console.log('📊 Resposta marcações:', response);
             
+            function parseDataParaISO(data) {
+                if (!data) return null;
+                if (/^\d{4}-\d{2}-\d{2}$/.test(data)) return data;
+                if (/^\d{2}\/\d{2}\/\d{4}$/.test(data)) {
+                    const [d, m, y] = data.split('/');
+                    return `${y}-${m}-${d}`;
+                }
+                const parsed = new Date(data);
+                return isNaN(parsed) ? null : parsed.toISOString().split('T')[0];
+            }
+            
             if (response.status === 'success' && response.registros && response.registros.length > 0) {
-                // Filtrar apenas o registro de HOJE (formato DD/MM/YYYY)
-                const registroHoje = response.registros.find(reg => reg.data === dataHoje);
+                const registroHoje = response.registros.find(reg => parseDataParaISO(reg.data) === dataHojeISO);
                 
                 if (registroHoje) {
                     console.log('✅ Encontrou registro de hoje:', registroHoje);
                     
-                    // Função para extrair apenas HH:MM:SS
                     function extrairHora(hora) {
                         if (!hora) return null;
                         if (hora.match(/^\d{2}:\d{2}:\d{2}$/)) return hora;
@@ -1089,7 +1057,6 @@ async function carregarMarcacoesDoDia() {
                         return hora;
                     }
                     
-                    // Atualizar as marcações
                     if (registroHoje.marcacao1) {
                         marcacoes[0] = { 
                             hora: extrairHora(registroHoje.marcacao1), 
@@ -1119,17 +1086,13 @@ async function carregarMarcacoesDoDia() {
                         };
                     }
                     
-                    // Atualizar próximo índice
                     proximoIndice = marcacoes.findIndex(m => m.hora === null);
                     if (proximoIndice === -1) proximoIndice = 4;
                     
                     atualizarCardsMarcacoes();
-                    salvarEstadoAtualNoStorage();
-                    
                     statusText.textContent = '✅ Marcações de hoje carregadas!';
                 } else {
-                    console.log('📋 Nenhum registro para hoje (' + dataHoje + ')');
-                    // Não encontrou registros de hoje, reseta
+                    console.log('📋 Nenhum registro para hoje (' + dataHojeBr + ')');
                     resetarMarcacoes();
                     atualizarCardsMarcacoes();
                     statusText.textContent = '📋 Nenhuma marcação hoje. Pronto para registrar.';
@@ -1150,7 +1113,7 @@ async function carregarMarcacoesDoDia() {
         script.src = url.replace('jsonpCallback', callbackName);
         script.onerror = function() {
             console.log('⚠️ Erro ao carregar marcações');
-            statusText.textContent = '📋 Usando dados locais';
+            statusText.textContent = '❌ Erro ao carregar planilha';
             delete window[callbackName];
             document.body.removeChild(script);
             resolve(false);
@@ -1168,8 +1131,7 @@ async function inicializar() {
     }
     
     selectColab.addEventListener('change', async (e) => {
-        salvarEstadoAtualNoStorage();
-        colaboradorSelecionado = e.target.value;
+
         // CARREGAR MARCAÇÕES DO NOVO COLABORADOR
         await carregarMarcacoesDoDia();
         atualizarStatusBotao();
@@ -1187,7 +1149,7 @@ async function inicializar() {
     btnBuscarRelatorio.addEventListener('click', buscarRelatorio);
     btnExportExcel.addEventListener('click', exportarExcel);
     btnExportPNG.addEventListener('click', exportarPNG);
-    window.addEventListener('beforeunload', () => salvarEstadoAtualNoStorage());
+    window.addEventListener('beforeunload', () => {});
     
     console.log('✅ Sistema inicializado! Colaborador:', colaboradorSelecionado);
 }
