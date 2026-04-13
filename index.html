@@ -601,11 +601,15 @@
             dataSpan.textContent = `${agora.getDate()} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}`;
             diaSemanaSpan.textContent = dias[agora.getDay()];
             
-            // Configurar datas do filtro
-            const hoje = new Date().toISOString().split('T')[0];
-            const seteDiasAtras = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-            if (dataFim) dataFim.value = hoje;
-            if (dataInicio) dataInicio.value = seteDiasAtras;
+            const hoje = new Date();
+            const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+
+            const dataInicioPadrao = primeiroDia.toISOString().split('T')[0];
+            const dataFimPadrao = ultimoDia.toISOString().split('T')[0];
+
+            if (dataFim) dataFim.value = dataFimPadrao;
+            if (dataInicio) dataInicio.value = dataInicioPadrao;
         }
         atualizarData();
         setInterval(atualizarData, 60000);
@@ -839,14 +843,15 @@
             }
         }
         
-        // Toggle relatório
+// Toggle relatório
         function toggleRelatorio() {
             if (relatorioArea.style.display === 'none') {
-                relatorioArea.style.display = 'block';
-                btnRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar';
+            relatorioArea.style.display = 'block';
+            btnRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar';
+            buscarRelatorio(); // 🔥 BUSCAR AUTOMATICAMENTE AO ABRIR
             } else {
-                relatorioArea.style.display = 'none';
-                btnRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatório';
+        relatorioArea.style.display = 'none';
+        btnRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatório';
             }
         }
         
