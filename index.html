@@ -540,95 +540,56 @@
         ];
         
         // ============================================
-        // FUNÇÃO PARA CONVERTER DATA/HORA DO GOOGLE SHEETS
+        // FUNÇÃO SIMPLES PARA FORMATAR HORA (APENAS VISUAL)
         // ============================================
-        function converterDataHoraGoogleSheets(valor) {
+        function formatarHoraExibicao(valor) {
             if (!valor || valor === '') return '';
             
-            // Se for string e já estiver no formato HH:MM:SS
-            if (typeof valor === 'string' && valor.match(/^\d{2}:\d{2}:\d{2}$/)) {
+            // Se já for string no formato HH:MM:SS
+            if (typeof valor === 'string') {
+                // Se já está no formato correto
+                if (valor.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                    return valor;
+                }
+                // Se for data ISO ou outro formato, tenta extrair a hora
+                if (valor.includes('T')) {
+                    const match = valor.match(/T(\d{2}:\d{2}:\d{2})/);
+                    if (match) return match[1];
+                }
+                // Se for data completa do Google Sheets
+                if (valor.includes('GMT') || valor.includes('Dec')) {
+                    const match = valor.match(/(\d{2}):(\d{2}):(\d{2})/);
+                    if (match) return `${match[1]}:${match[2]}:${match[3]}`;
+                }
                 return valor;
             }
             
-            // Se for string e já estiver no formato DD/MM/YYYY
+            // Se for objeto Date
+            if (valor instanceof Date) {
+                const h = String(valor.getHours()).padStart(2, '0');
+                const m = String(valor.getMinutes()).padStart(2, '0');
+                const s = String(valor.getSeconds()).padStart(2, '0');
+                return `${h}:${m}:${s}`;
+            }
+            
+            return String(valor);
+        }
+        
+        function formatarDataExibicao(valor) {
+            if (!valor || valor === '') return '';
+            
+            // Se já for string no formato DD/MM/YYYY
             if (typeof valor === 'string' && valor.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
                 return valor;
             }
             
-            // Converter número serial do Excel/Google Sheets
-            let numeroSerial;
-            
-            if (typeof valor === 'number') {
-                numeroSerial = valor;
-            } else if (typeof valor === 'string' && !isNaN(parseFloat(valor))) {
-                numeroSerial = parseFloat(valor);
-            } else {
-                // Tentar parse de data
-                try {
-                    const dt = new Date(valor);
-                    if (!isNaN(dt.getTime())) {
-                        // Verificar se é uma data válida (não 1899)
-                        if (dt.getFullYear() > 1900) {
-                            return dt;
-                        }
-                    }
-                } catch (e) {}
-                return valor;
+            // Se for string no formato YYYY-MM-DD
+            if (typeof valor === 'string' && valor.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const [ano, mes, dia] = valor.split('-');
+                return `${dia}/${mes}/${ano}`;
             }
             
-            // Google Sheets/Excel: 1 = 01/01/1900
-            // Ajuste: 25569 = diferença entre 30/12/1899 e 01/01/1970
-            const dataBase = new Date(1899, 11, 30); // 30/12/1899
-            
-            // Converter número serial para milissegundos
-            const dias = Math.floor(numeroSerial);
-            const horasDecimais = (numeroSerial - dias) * 24;
-            const horas = Math.floor(horasDecimais);
-            const minutosDecimais = (horasDecimais - horas) * 60;
-            const minutos = Math.floor(minutosDecimais);
-            const segundos = Math.floor((minutosDecimais - minutos) * 60);
-            
-            // Calcular data
-            const data = new Date(dataBase);
-            data.setDate(dataBase.getDate() + dias);
-            
-            // Formatar
-            const dia = String(data.getDate()).padStart(2, '0');
-            const mes = String(data.getMonth() + 1).padStart(2, '0');
-            const ano = data.getFullYear();
-            const horaStr = String(horas).padStart(2, '0');
-            const minStr = String(minutos).padStart(2, '0');
-            const segStr = String(segundos).padStart(2, '0');
-            
-            return {
-                data: `${dia}/${mes}/${ano}`,
-                hora: `${horaStr}:${minStr}:${segStr}`,
-                dataHora: new Date(ano, data.getMonth(), dia, horas, minutos, segundos)
-            };
-        }
-        
-        function formatarHora(valor) {
-            if (!valor) return '';
-            const convertido = converterDataHoraGoogleSheets(valor);
-            if (typeof convertido === 'object' && convertido.hora) {
-                return convertido.hora;
-            }
-            if (typeof convertido === 'string' && convertido.match(/^\d{2}:\d{2}:\d{2}$/)) {
-                return convertido;
-            }
-            return '';
-        }
-        
-        function formatarData(valor) {
-            if (!valor) return '';
-            const convertido = converterDataHoraGoogleSheets(valor);
-            if (typeof convertido === 'object' && convertido.data) {
-                return convertido.data;
-            }
-            if (typeof convertido === 'string' && convertido.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                return convertido;
-            }
-            return '';
+            return String(valor);
         }
         
         // Inicializar datas
@@ -655,6 +616,8 @@
                 const callbackName = 'jsonp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
                 const url = SCRIPT_URL + '?' + params.toString() + '&callback=' + callbackName;
                 
+                console.log('📤 Request:', url);
+                
                 const timeoutId = setTimeout(() => {
                     cleanup();
                     reject(new Error('Timeout'));
@@ -667,6 +630,7 @@
                 };
                 
                 window[callbackName] = (response) => {
+                    console.log('📥 Response:', response);
                     cleanup();
                     resolve(response);
                 };
@@ -737,21 +701,19 @@
                 if (response.status === 'success' && response.registros && response.registros.length > 0) {
                     const reg = response.registros[0];
                     
+                    console.log('Registro encontrado:', reg);
+                    
                     if (reg.marcacao1) {
-                        const hora1 = formatarHora(reg.marcacao1);
-                        marcacoes[0] = {hora: hora1, local: reg.local1};
+                        marcacoes[0] = {hora: formatarHoraExibicao(reg.marcacao1), local: reg.local1};
                     }
                     if (reg.marcacao2) {
-                        const hora2 = formatarHora(reg.marcacao2);
-                        marcacoes[1] = {hora: hora2, local: reg.local2};
+                        marcacoes[1] = {hora: formatarHoraExibicao(reg.marcacao2), local: reg.local2};
                     }
                     if (reg.marcacao3) {
-                        const hora3 = formatarHora(reg.marcacao3);
-                        marcacoes[2] = {hora: hora3, local: reg.local3};
+                        marcacoes[2] = {hora: formatarHoraExibicao(reg.marcacao3), local: reg.local3};
                     }
                     if (reg.marcacao4) {
-                        const hora4 = formatarHora(reg.marcacao4);
-                        marcacoes[3] = {hora: hora4, local: reg.local4};
+                        marcacoes[3] = {hora: formatarHoraExibicao(reg.marcacao4), local: reg.local4};
                     }
                 }
                 
@@ -898,7 +860,6 @@
                 params.append('dataInicio', dataInicio.value);
                 params.append('dataFim', dataFim.value);
                 params.append('colaborador', 'todos');
-                params.append('debug', 'true');
                 params.append('_', Date.now());
                 
                 const response = await jsonpRequest(params);
@@ -921,11 +882,11 @@
                         const dataB = b.data ? b.data.split('/').reverse().join('-') : '';
                         return dataB.localeCompare(dataA);
                     }).forEach(reg => {
-                        const dataFormatada = reg.data || '—';
-                        const hora1 = formatarHora(reg.marcacao1) || '—';
-                        const hora2 = formatarHora(reg.marcacao2) || '—';
-                        const hora3 = formatarHora(reg.marcacao3) || '—';
-                        const hora4 = formatarHora(reg.marcacao4) || '—';
+                        const dataFormatada = formatarDataExibicao(reg.data) || '—';
+                        const hora1 = formatarHoraExibicao(reg.marcacao1) || '—';
+                        const hora2 = formatarHoraExibicao(reg.marcacao2) || '—';
+                        const hora3 = formatarHoraExibicao(reg.marcacao3) || '—';
+                        const hora4 = formatarHoraExibicao(reg.marcacao4) || '—';
                         
                         html += `<tr>
                             <td class="nome-colab">${reg.colaborador || '—'}</td>
@@ -961,10 +922,10 @@
             let csv = 'Colaborador,Data,1ª Marcação,2ª Marcação,3ª Marcação,4ª Marcação\n';
             
             dadosRelatorio.forEach(reg => {
-                const hora1 = formatarHora(reg.marcacao1) || '';
-                const hora2 = formatarHora(reg.marcacao2) || '';
-                const hora3 = formatarHora(reg.marcacao3) || '';
-                const hora4 = formatarHora(reg.marcacao4) || '';
+                const hora1 = formatarHoraExibicao(reg.marcacao1) || '';
+                const hora2 = formatarHoraExibicao(reg.marcacao2) || '';
+                const hora3 = formatarHoraExibicao(reg.marcacao3) || '';
+                const hora4 = formatarHoraExibicao(reg.marcacao4) || '';
                 
                 csv += `"${reg.colaborador || ''}","${reg.data || ''}","${hora1}","${hora2}","${hora3}","${hora4}"\n`;
             });
