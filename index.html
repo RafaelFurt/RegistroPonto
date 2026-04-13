@@ -859,12 +859,18 @@
         async function buscarRelatorio() {
             try {
                 statusTexto.textContent = 'Carregando relatório...';
-                
+        
+                const dataInicioVal = dataInicio.value;
+                const dataFimVal = dataFim.value;
+        
+                console.log('🔍 DATAS DO FILTRO:', dataInicioVal, 'até', dataFimVal);
+        
                 const params = new URLSearchParams();
                 params.append('acao', 'consultar');
-                params.append('dataInicio', dataInicio.value);
-                params.append('dataFim', dataFim.value);
+                params.append('dataInicio', dataInicioVal);
+                params.append('dataFim', dataFimVal);
                 params.append('colaborador', 'todos');
+                params.append('debug', 'true'); // 👈 Adicionar debug
                 params.append('_', Date.now());
                 
                 const response = await jsonpRequest(params);
