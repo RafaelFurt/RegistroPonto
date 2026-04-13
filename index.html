@@ -2,574 +2,565 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Registro de Ponto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#6366f1">
+    <title>Ponto.ID</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
+        
         body {
-            background: #f5f0eb;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 12px;
-            color: #1e1e1e;
         }
-        .app-container {
-            max-width: 560px;
+        
+        .app {
+            max-width: 480px;
             width: 100%;
             background: white;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px rgba(98, 0, 0, 0.08);
-            padding: 20px 16px 28px;
-            border: 1px solid rgba(98, 0, 0, 0.1);
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1);
+            padding: 24px 20px;
         }
-        .app-header {
+        
+        .header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #620000;
-            padding-bottom: 14px;
+            gap: 8px;
+            margin-bottom: 24px;
         }
-        .app-header i {
+        
+        .header i {
             font-size: 28px;
-            color: #620000;
+            color: #6366f1;
         }
-        .app-header h1 {
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .header span {
+            color: #6366f1;
+        }
+        
+        .data-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .data-principal {
+            font-size: 18px;
             font-weight: 600;
-            font-size: 1.8rem;
-            color: #2c0e0e;
-        }
-        .app-header h1 span {
-            color: #620000;
-        }
-        .data-atual {
-            background: #f9f3ef;
-            padding: 10px 14px;
-            border-radius: 50px;
+            color: #1e293b;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            border-left: 6px solid #620000;
-            flex-wrap: wrap;
             gap: 8px;
         }
-        .data-texto {
+        
+        .data-principal i {
+            color: #6366f1;
+        }
+        
+        .dia-semana {
+            font-size: 14px;
+            color: #6366f1;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+        
+        .colaborador-area {
+            margin-bottom: 24px;
+        }
+        
+        .label {
+            font-size: 14px;
             font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .data-texto i {
-            color: #620000;
-            margin-right: 6px;
-        }
-        #diaSemana {
-            background: #62000010;
-            padding: 5px 12px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-        }
-        .colaborador-section {
-            margin-bottom: 20px;
-        }
-        .label-icon {
-            font-weight: 500;
+            color: #64748b;
             margin-bottom: 8px;
-            color: #3d1a1a;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 1rem;
+            gap: 6px;
         }
-        .label-icon i {
-            color: #620000;
+        
+        .label i {
+            color: #6366f1;
         }
-        .seletor-colaborador {
+        
+        .seletor-row {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
-        select, input {
-            background: white;
-            border: 1.5px solid #d9c7c0;
-            border-radius: 40px;
-            padding: 12px 16px;
-            font-size: 1rem;
+        
+        select {
+            flex: 1;
+            padding: 14px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
             font-family: 'Inter', sans-serif;
+            background: white;
+            color: #1e293b;
             outline: none;
-            flex: 2;
-            min-width: 160px;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
         }
-        select:focus, input:focus {
-            border-color: #620000;
-            box-shadow: 0 0 0 3px rgba(98, 0, 0, 0.1);
+        
+        select:focus {
+            border-color: #6366f1;
         }
-        .btn-cadastrar {
-            background: #620000;
-            border: none;
-            border-radius: 40px;
-            padding: 0 18px;
-            font-weight: 600;
+        
+        .btn-novo {
+            padding: 14px 20px;
+            background: #6366f1;
             color: white;
-            font-size: 0.95rem;
+            border: none;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 6px;
             cursor: pointer;
             white-space: nowrap;
-            min-height: 48px;
         }
-        .btn-cadastrar:active {
-            background: #4a0000;
+        
+        .btn-novo:active {
+            background: #4f46e5;
         }
+        
         .marcacoes-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin: 18px 0 20px;
+            margin-bottom: 24px;
         }
-        .card-marcacao {
-            background: #fcf9f7;
-            border-radius: 18px;
-            padding: 14px 10px;
-            border: 1px solid #e5d8d2;
+        
+        .card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 16px 12px;
+            border: 1.5px solid #e2e8f0;
+            transition: all 0.2s;
         }
-        .card-marcacao.preenchido {
-            background: #f1e8e4;
-            border-left: 6px solid #620000;
+        
+        .card.preenchido {
+            background: #eef2ff;
+            border-color: #6366f1;
         }
-        .titulo-marcacao {
+        
+        .card-titulo {
+            font-size: 12px;
             font-weight: 600;
-            font-size: 0.85rem;
             text-transform: uppercase;
-            color: #4e2b2b;
+            letter-spacing: 0.5px;
+            color: #64748b;
             margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
         }
-        .titulo-marcacao i {
-            color: #620000;
+        
+        .card-titulo i {
+            color: #6366f1;
         }
-        .hora-marcacao {
-            font-size: 1.5rem;
+        
+        .card-hora {
+            font-size: 22px;
             font-weight: 700;
-            color: #1e1e1e;
+            color: #1e293b;
+            font-feature-settings: "tnum";
         }
-        .local-marcacao {
-            font-size: 0.75rem;
-            color: #6b4e4e;
+        
+        .card-local {
+            font-size: 11px;
+            color: #64748b;
             margin-top: 6px;
             display: flex;
             align-items: center;
             gap: 4px;
         }
+        
+        .card-desc {
+            font-size: 10px;
+            color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
         .btn-ponto {
-            background: #620000;
+            width: 100%;
+            padding: 20px;
+            background: #6366f1;
             color: white;
             border: none;
-            width: 100%;
-            padding: 18px 16px;
-            border-radius: 50px;
+            border-radius: 20px;
+            font-size: 18px;
             font-weight: 700;
-            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            box-shadow: 0 8px 18px rgba(98, 0, 0, 0.25);
+            gap: 10px;
             cursor: pointer;
-            margin: 8px 0 16px;
-            min-height: 60px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            transition: all 0.2s;
         }
+        
         .btn-ponto:active {
-            background: #4a0000;
+            background: #4f46e5;
+            transform: scale(0.98);
         }
+        
         .btn-ponto:disabled {
-            background: #b9a7a7;
+            background: #cbd5e1;
             box-shadow: none;
             cursor: not-allowed;
-            opacity: 0.6;
         }
-        .acoes-secundarias {
+        
+        .acoes {
             display: flex;
             gap: 8px;
-            margin-top: 8px;
-            flex-wrap: wrap;
+            margin-bottom: 16px;
         }
-        .btn-secundario {
-            background: transparent;
-            border: 1.5px solid #620000;
-            color: #620000;
-            padding: 10px 12px;
-            border-radius: 40px;
-            font-weight: 600;
+        
+        .btn-acao {
             flex: 1;
-            min-width: 80px;
-            cursor: pointer;
+            padding: 14px;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            font-size: 0.9rem;
-            min-height: 44px;
+            cursor: pointer;
         }
-        .btn-secundario:active {
-            background: #fff0ec;
+        
+        .btn-acao:active {
+            background: #f8fafc;
         }
-        .status-msg {
-            margin-top: 16px;
-            padding: 10px 14px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            background: #f2e7e2;
-            color: #3d1f1f;
+        
+        .status {
+            padding: 14px 16px;
+            background: #d1fae5;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #10b981;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-left: 5px solid #620000;
+            gap: 8px;
         }
-        .relatorio-section {
+        
+        .status i {
+            font-size: 16px;
+        }
+        
+        .relatorio-area {
             margin-top: 20px;
-            padding-top: 18px;
-            border-top: 2px dashed #d9c7c0;
+            padding-top: 20px;
+            border-top: 2px dashed #e2e8f0;
         }
+        
         .relatorio-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
+            margin-bottom: 16px;
         }
+        
         .relatorio-header h3 {
-            color: #620000;
-            font-size: 1.2rem;
+            font-size: 16px;
+            color: #1e293b;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .export-buttons {
+        
+        .filtros {
             display: flex;
             gap: 8px;
+            margin-bottom: 16px;
         }
-        .btn-export {
-            background: #620000;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 8px 14px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            min-height: 40px;
-        }
-        .filtros-relatorio {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-        }
+        
         .filtro-data {
             flex: 1;
-            min-width: 120px;
-            padding: 10px 12px;
-            border-radius: 40px;
-            border: 1.5px solid #d9c7c0;
-            font-size: 0.9rem;
+            padding: 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            background: white;
         }
-        .btn-relatorio {
-            background: #620000;
+        
+        .btn-buscar {
+            padding: 12px 20px;
+            background: #6366f1;
             color: white;
             border: none;
-            border-radius: 40px;
-            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-            min-height: 48px;
         }
-        .resultado-relatorio {
-            max-height: 350px;
+        
+        .tabela-container {
+            max-height: 300px;
             overflow-y: auto;
-            background: #fcf9f7;
             border-radius: 16px;
-            padding: 12px;
-            margin-top: 12px;
+            border: 1px solid #e2e8f0;
         }
-        .tabela-relatorio {
+        
+        table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem;
+            font-size: 12px;
             background: white;
-            border-radius: 12px;
-            overflow: hidden;
         }
-        .tabela-relatorio th {
-            background: #620000;
+        
+        th {
+            background: #6366f1;
             color: white;
-            padding: 10px 4px;
+            padding: 12px 4px;
             font-weight: 600;
-            text-align: center;
+            position: sticky;
+            top: 0;
         }
-        .tabela-relatorio td {
-            padding: 8px 4px;
+        
+        td {
+            padding: 10px 4px;
             text-align: center;
-            border-bottom: 1px solid #e5d8d2;
+            border-bottom: 1px solid #e2e8f0;
         }
-        .tabela-relatorio .colab-nome {
+        
+        .nome-colab {
             text-align: left;
             padding-left: 8px;
             font-weight: 500;
-            color: #620000;
+            color: #6366f1;
         }
-        .tabela-relatorio .hora-cell {
+        
+        .hora-cell {
             font-family: monospace;
             font-weight: 600;
         }
-        .sem-registros {
+        
+        .sem-dados {
             text-align: center;
-            padding: 20px;
-            color: #6b4e4e;
+            padding: 30px;
+            color: #64748b;
         }
-        .footer-note {
-            font-size: 0.8rem;
+        
+        .btn-exportar {
+            padding: 8px 14px;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+        }
+        
+        .footer {
+            text-align: center;
             margin-top: 16px;
-            color: #6f5555;
-            text-align: center;
-        }
-        .lista-colab {
-            font-size: 0.8rem;
-            margin-top: 6px;
-            color: #4a2a2a;
-        }
-        @media (max-width: 480px) {
-            body {
-                padding: 8px;
-            }
-            .app-container {
-                border-radius: 24px;
-                padding: 16px 12px 24px;
-            }
+            font-size: 12px;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-    <div class="app-header">
-        <i class="fas fa-fingerprint"></i>
-        <h1>Ponto<span>.</span>ID</h1>
-    </div>
-
-    <div class="data-atual">
-        <span class="data-texto">
-            <i class="far fa-calendar-alt"></i> 
-            <span id="dataCompleta">Carregando...</span>
-        </span>
-        <span id="diaSemana"></span>
-    </div>
-
-    <div class="colaborador-section">
-        <div class="label-icon">
-            <i class="fas fa-user-check"></i> Colaborador atual
+    <div class="app">
+        <div class="header">
+            <i class="fas fa-fingerprint"></i>
+            <h1>Ponto<span>.</span>ID</h1>
         </div>
-        <div class="seletor-colaborador">
-            <select id="selectColaborador">
-                <option>Carregando...</option>
-            </select>
-            <button class="btn-cadastrar" id="btnCadastrarNovo">
-                <i class="fas fa-plus-circle"></i> Novo
-            </button>
+        
+        <div class="data-card">
+            <div class="data-principal">
+                <i class="far fa-calendar-alt"></i>
+                <span id="dataCompleta"></span>
+            </div>
+            <span class="dia-semana" id="diaSemana"></span>
         </div>
-        <div id="listaColabs" class="lista-colab"></div>
-    </div>
-
-    <div class="marcacoes-grid">
-        <div class="card-marcacao" id="card1">
-            <div class="titulo-marcacao">1ª Marcacao <i class="fas fa-play"></i></div>
-            <div class="hora-marcacao" id="hora1">--:--</div>
-            <div class="local-marcacao" id="local1"><i class="fas fa-map-pin"></i> Aguardando...</div>
-        </div>
-        <div class="card-marcacao" id="card2">
-            <div class="titulo-marcacao">2ª Marcacao <i class="fas fa-utensils"></i></div>
-            <div class="hora-marcacao" id="hora2">--:--</div>
-            <div class="local-marcacao" id="local2"><i class="fas fa-map-pin"></i> Aguardando...</div>
-        </div>
-        <div class="card-marcacao" id="card3">
-            <div class="titulo-marcacao">3ª Marcacao <i class="fas fa-arrow-return-left"></i></div>
-            <div class="hora-marcacao" id="hora3">--:--</div>
-            <div class="local-marcacao" id="local3"><i class="fas fa-map-pin"></i> Aguardando...</div>
-        </div>
-        <div class="card-marcacao" id="card4">
-            <div class="titulo-marcacao">4ª Marcacao <i class="fas fa-flag-checkered"></i></div>
-            <div class="hora-marcacao" id="hora4">--:--</div>
-            <div class="local-marcacao" id="local4"><i class="fas fa-map-pin"></i> Aguardando...</div>
-        </div>
-    </div>
-
-    <button class="btn-ponto" id="btnMarcarPonto">
-        <i class="fas fa-clock"></i> Registrar Ponto
-    </button>
-
-    <div class="acoes-secundarias">
-        <button class="btn-secundario" id="btnResetarDia">
-            <i class="fas fa-undo-alt"></i> Resetar
-        </button>
-        <button class="btn-secundario" id="btnGerenciarColabs">
-            <i class="fas fa-users-cog"></i> Gerenciar
-        </button>
-        <button class="btn-secundario" id="btnToggleRelatorio">
-            <i class="fas fa-chart-bar"></i> Relatorio
-        </button>
-    </div>
-
-    <div class="status-msg" id="statusMessage">
-        <i class="fas fa-info-circle"></i> 
-        <span id="statusText">Iniciando sistema...</span>
-    </div>
-
-    <div class="relatorio-section" id="relatorioSection" style="display: none;">
-        <div class="relatorio-header">
-            <h3><i class="fas fa-history"></i> Historico de Pontos</h3>
-            <div class="export-buttons">
-                <button class="btn-export" id="btnExportExcel">
-                    <i class="fas fa-file-excel"></i> Excel
-                </button>
-                <button class="btn-export" id="btnExportPNG">
-                    <i class="fas fa-image"></i> PNG
-                </button>
-                <button class="btn-secundario" id="btnFecharRelatorio" style="padding: 8px 12px;">
-                    <i class="fas fa-times"></i>
+        
+        <div class="colaborador-area">
+            <div class="label">
+                <i class="fas fa-user"></i>
+                <span>Colaborador</span>
+            </div>
+            <div class="seletor-row">
+                <select id="selectColaborador"></select>
+                <button class="btn-novo" id="btnNovo">
+                    <i class="fas fa-plus"></i> Novo
                 </button>
             </div>
         </div>
         
-        <div class="filtros-relatorio">
-            <input type="date" id="filtroDataInicio" class="filtro-data">
-            <input type="date" id="filtroDataFim" class="filtro-data">
-            <button class="btn-relatorio" id="btnBuscarRelatorio">
-                <i class="fas fa-search"></i> Buscar
-            </button>
-        </div>
-
-        <div class="resultado-relatorio" id="resultadoRelatorio">
-            <div class="sem-registros">
-                <i class="fas fa-calendar-times"></i> Selecione as datas e clique em Buscar
+        <div class="marcacoes-grid">
+            <div class="card" id="card1">
+                <div class="card-titulo">1ª Marcação <i class="fas fa-play"></i></div>
+                <div class="card-hora" id="hora1">--:--</div>
+                <div class="card-local" id="local1"><i class="fas fa-map-pin"></i> Aguardando...</div>
+                <span class="card-desc">Início da jornada</span>
+            </div>
+            <div class="card" id="card2">
+                <div class="card-titulo">2ª Marcação <i class="fas fa-utensils"></i></div>
+                <div class="card-hora" id="hora2">--:--</div>
+                <div class="card-local" id="local2"><i class="fas fa-map-pin"></i> Aguardando...</div>
+                <span class="card-desc">Saída almoço</span>
+            </div>
+            <div class="card" id="card3">
+                <div class="card-titulo">3ª Marcação <i class="fas fa-arrow-return-left"></i></div>
+                <div class="card-hora" id="hora3">--:--</div>
+                <div class="card-local" id="local3"><i class="fas fa-map-pin"></i> Aguardando...</div>
+                <span class="card-desc">Retorno almoço</span>
+            </div>
+            <div class="card" id="card4">
+                <div class="card-titulo">4ª Marcação <i class="fas fa-flag-checkered"></i></div>
+                <div class="card-hora" id="hora4">--:--</div>
+                <div class="card-local" id="local4"><i class="fas fa-map-pin"></i> Aguardando...</div>
+                <span class="card-desc">Fim expediente</span>
             </div>
         </div>
+        
+        <button class="btn-ponto" id="btnPonto">
+            <i class="fas fa-clock"></i> REGISTRAR PONTO
+        </button>
+        
+        <div class="acoes">
+            <button class="btn-acao" id="btnResetar">
+                <i class="fas fa-undo-alt"></i> Resetar
+            </button>
+            <button class="btn-acao" id="btnRelatorio">
+                <i class="fas fa-chart-bar"></i> Relatório
+            </button>
+        </div>
+        
+        <div class="status" id="status">
+            <i class="fas fa-info-circle"></i>
+            <span id="statusTexto">Pronto para registrar</span>
+        </div>
+        
+        <div class="relatorio-area" id="relatorioArea" style="display: none;">
+            <div class="relatorio-header">
+                <h3><i class="fas fa-history"></i> Histórico</h3>
+                <button class="btn-exportar" id="btnExportar">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+            </div>
+            <div class="filtros">
+                <input type="date" id="dataInicio" class="filtro-data">
+                <input type="date" id="dataFim" class="filtro-data">
+                <button class="btn-buscar" id="btnBuscar">Buscar</button>
+            </div>
+            <div class="tabela-container" id="tabelaContainer">
+                <div class="sem-dados">Selecione as datas e clique em Buscar</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <i class="fas fa-location-dot"></i> Localização automática
+        </div>
     </div>
 
-    <div class="footer-note">
-        <i class="fas fa-location-dot" style="color:#620000;"></i> 
-        Localizacao automatica • Horario real • Sincronizado
-    </div>
-</div>
-
-<script>
-    (function(){
-        "use strict";
-
-        // ATUALIZE ESTA URL COM A DO SEU APPS SCRIPT
+    <script>
+        // Substitua pela URL do seu Apps Script
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxWIeQWcVxYQZLAF8BNcrv-4jQ7QKBVCAaWpYlPSlIBNdlj4TQuk2FOrpaWqJg6HVko/exec';
         
-        console.log('=== SISTEMA DE PONTO INICIADO ===');
-        console.log('Script URL:', SCRIPT_URL);
-
+        // Estado da aplicação
         let colaboradores = [];
         let colaboradorSelecionado = null;
-        let marcacoes = [
-            { hora: null, local: null },
-            { hora: null, local: null },
-            { hora: null, local: null },
-            { hora: null, local: null }
-        ];
+        let marcacoes = [{hora: null}, {hora: null}, {hora: null}, {hora: null}];
         let proximoIndice = 0;
-        let dadosTabelaAtual = [];
-
+        
         // Elementos DOM
         const dataSpan = document.getElementById('dataCompleta');
         const diaSemanaSpan = document.getElementById('diaSemana');
         const selectColab = document.getElementById('selectColaborador');
-        const btnCadastrar = document.getElementById('btnCadastrarNovo');
-        const btnMarcar = document.getElementById('btnMarcarPonto');
-        const btnReset = document.getElementById('btnResetarDia');
-        const btnGerenciarColabs = document.getElementById('btnGerenciarColabs');
-        const btnToggleRelatorio = document.getElementById('btnToggleRelatorio');
-        const btnFecharRelatorio = document.getElementById('btnFecharRelatorio');
-        const btnBuscarRelatorio = document.getElementById('btnBuscarRelatorio');
-        const btnExportExcel = document.getElementById('btnExportExcel');
-        const btnExportPNG = document.getElementById('btnExportPNG');
-        const statusText = document.getElementById('statusText');
-        const listaColabsDiv = document.getElementById('listaColabs');
-        const relatorioSection = document.getElementById('relatorioSection');
-        const resultadoRelatorio = document.getElementById('resultadoRelatorio');
-        const filtroDataInicio = document.getElementById('filtroDataInicio');
-        const filtroDataFim = document.getElementById('filtroDataFim');
-
-        const horaEls = [
-            document.getElementById('hora1'), document.getElementById('hora2'), 
-            document.getElementById('hora3'), document.getElementById('hora4')
+        const btnNovo = document.getElementById('btnNovo');
+        const btnPonto = document.getElementById('btnPonto');
+        const btnResetar = document.getElementById('btnResetar');
+        const btnRelatorio = document.getElementById('btnRelatorio');
+        const btnBuscar = document.getElementById('btnBuscar');
+        const btnExportar = document.getElementById('btnExportar');
+        const statusTexto = document.getElementById('statusTexto');
+        const relatorioArea = document.getElementById('relatorioArea');
+        const dataInicio = document.getElementById('dataInicio');
+        const dataFim = document.getElementById('dataFim');
+        const tabelaContainer = document.getElementById('tabelaContainer');
+        
+        const horas = [
+            document.getElementById('hora1'),
+            document.getElementById('hora2'),
+            document.getElementById('hora3'),
+            document.getElementById('hora4')
         ];
-        const localEls = [
-            document.getElementById('local1'), document.getElementById('local2'), 
-            document.getElementById('local3'), document.getElementById('local4')
+        const locais = [
+            document.getElementById('local1'),
+            document.getElementById('local2'),
+            document.getElementById('local3'),
+            document.getElementById('local4')
         ];
         const cards = [
-            document.getElementById('card1'), document.getElementById('card2'), 
-            document.getElementById('card3'), document.getElementById('card4')
+            document.getElementById('card1'),
+            document.getElementById('card2'),
+            document.getElementById('card3'),
+            document.getElementById('card4')
         ];
-
-        // Verificar se todos os elementos foram encontrados
-        console.log('Elementos carregados:', {
-            dataSpan: !!dataSpan,
-            selectColab: !!selectColab,
-            btnMarcar: !!btnMarcar
-        });
-
-        function atualizarDataAtual() {
+        
+        // Inicializar datas
+        function atualizarData() {
             const agora = new Date();
-            if (dataSpan) {
-                dataSpan.textContent = agora.toLocaleDateString('pt-BR', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-            }
-            if (diaSemanaSpan) {
-                diaSemanaSpan.textContent = agora.toLocaleDateString('pt-BR', { weekday: 'long' });
-            }
+            const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+            const dias = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
             
+            dataSpan.textContent = `${agora.getDate()} de ${meses[agora.getMonth()]} de ${agora.getFullYear()}`;
+            diaSemanaSpan.textContent = dias[agora.getDay()];
+            
+            // Configurar datas do filtro
             const hoje = new Date().toISOString().split('T')[0];
             const seteDiasAtras = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-            
-            if (filtroDataFim && !filtroDataFim.value) filtroDataFim.value = hoje;
-            if (filtroDataInicio && !filtroDataInicio.value) filtroDataInicio.value = seteDiasAtras;
+            if (dataFim) dataFim.value = hoje;
+            if (dataInicio) dataInicio.value = seteDiasAtras;
         }
-
-        atualizarDataAtual();
-        setInterval(atualizarDataAtual, 60000);
-
+        atualizarData();
+        setInterval(atualizarData, 60000);
+        
+        // JSONP Request
         function jsonpRequest(params) {
             return new Promise((resolve, reject) => {
                 const callbackName = 'jsonp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
                 const url = SCRIPT_URL + '?' + params.toString() + '&callback=' + callbackName;
-                
-                console.log('JSONP Request:', url);
                 
                 const timeoutId = setTimeout(() => {
                     cleanup();
@@ -578,16 +569,11 @@
                 
                 const cleanup = () => {
                     clearTimeout(timeoutId);
-                    if (window[callbackName]) {
-                        delete window[callbackName];
-                    }
-                    if (script.parentNode) {
-                        document.body.removeChild(script);
-                    }
+                    delete window[callbackName];
+                    if (script.parentNode) document.body.removeChild(script);
                 };
                 
                 window[callbackName] = (response) => {
-                    console.log('JSONP Response:', response);
                     cleanup();
                     resolve(response);
                 };
@@ -595,47 +581,34 @@
                 const script = document.createElement('script');
                 script.src = url;
                 script.onerror = () => {
-                    console.error('JSONP Error');
                     cleanup();
-                    reject(new Error('Erro na requisicao'));
+                    reject(new Error('Erro na requisição'));
                 };
-                
                 document.body.appendChild(script);
             });
         }
-
+        
+        // Carregar colaboradores
         async function carregarColaboradores() {
-            if (statusText) statusText.textContent = 'Carregando colaboradores...';
-            
             try {
                 const params = new URLSearchParams();
                 params.append('acao', 'consultar_colaboradores');
                 params.append('_', Date.now());
                 
                 const response = await jsonpRequest(params);
-                console.log('Resposta colaboradores:', response);
                 
-                if (response.status === 'success' && response.colaboradores && response.colaboradores.length > 0) {
+                if (response.status === 'success' && response.colaboradores) {
                     colaboradores = response.colaboradores;
-                    if (statusText) statusText.textContent = 'Colaboradores carregados!';
                 } else {
-                    colaboradores = [{ nome: 'Funcionario Padrao' }];
-                    if (statusText) statusText.textContent = 'Usando colaborador padrao.';
+                    colaboradores = [{nome: 'Funcionário Padrão'}];
                 }
             } catch (error) {
-                console.error('Erro ao carregar colaboradores:', error);
-                colaboradores = [{ nome: 'Funcionario Padrao' }];
-                if (statusText) statusText.textContent = 'Erro ao carregar. Usando padrao.';
+                console.error('Erro:', error);
+                colaboradores = [{nome: 'Funcionário Padrão'}];
             }
             
-            atualizarSelectColaboradores();
-        }
-
-        function atualizarSelectColaboradores() {
-            if (!selectColab) return;
-            
             selectColab.innerHTML = '';
-            colaboradores.forEach((c) => {
+            colaboradores.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c.nome;
                 opt.textContent = c.nome;
@@ -645,325 +618,268 @@
             if (colaboradores.length > 0) {
                 colaboradorSelecionado = colaboradores[0].nome;
                 selectColab.value = colaboradorSelecionado;
+                carregarMarcacoes();
+            }
+        }
+        
+        // Carregar marcações do dia
+        async function carregarMarcacoes() {
+            if (!colaboradorSelecionado) return;
+            
+            try {
+                const hoje = new Date().toISOString().split('T')[0];
+                const params = new URLSearchParams();
+                params.append('acao', 'consultar');
+                params.append('dataInicio', hoje);
+                params.append('dataFim', hoje);
+                params.append('colaborador', colaboradorSelecionado);
+                params.append('_', Date.now());
+                
+                const response = await jsonpRequest(params);
+                
+                // Resetar marcações
+                marcacoes = [{hora: null}, {hora: null}, {hora: null}, {hora: null}];
+                proximoIndice = 0;
+                
+                if (response.status === 'success' && response.registros && response.registros.length > 0) {
+                    const reg = response.registros[0];
+                    if (reg.marcacao1) marcacoes[0] = {hora: reg.marcacao1, local: reg.local1};
+                    if (reg.marcacao2) marcacoes[1] = {hora: reg.marcacao2, local: reg.local2};
+                    if (reg.marcacao3) marcacoes[2] = {hora: reg.marcacao3, local: reg.local3};
+                    if (reg.marcacao4) marcacoes[3] = {hora: reg.marcacao4, local: reg.local4};
+                }
+                
+                // Calcular próximo índice
+                for (let i = 0; i < 4; i++) {
+                    if (!marcacoes[i].hora) {
+                        proximoIndice = i;
+                        break;
+                    }
+                }
+                if (marcacoes[3].hora) proximoIndice = 4;
+                
+                atualizarCards();
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+        
+        function atualizarCards() {
+            for (let i = 0; i < 4; i++) {
+                if (marcacoes[i].hora) {
+                    horas[i].textContent = marcacoes[i].hora;
+                    locais[i].innerHTML = `<i class="fas fa-map-pin"></i> ${marcacoes[i].local || 'Registrado'}`;
+                    cards[i].classList.add('preenchido');
+                } else {
+                    horas[i].textContent = '--:--';
+                    locais[i].innerHTML = '<i class="fas fa-map-pin"></i> Aguardando...';
+                    cards[i].classList.remove('preenchido');
+                }
             }
             
-            if (listaColabsDiv && colaboradores.length > 1) {
-                listaColabsDiv.innerHTML = colaboradores.map(c => c.nome).join(' • ');
+            atualizarStatus();
+        }
+        
+        function atualizarStatus() {
+            if (!colaboradorSelecionado) {
+                btnPonto.disabled = true;
+                statusTexto.textContent = 'Selecione um colaborador';
+            } else if (proximoIndice >= 4) {
+                btnPonto.disabled = true;
+                statusTexto.textContent = '✅ Expediente completo!';
+            } else {
+                btnPonto.disabled = false;
+                const etapas = ['Início da jornada', 'Saída almoço', 'Retorno almoço', 'Fim expediente'];
+                statusTexto.textContent = `Próximo: ${etapas[proximoIndice]}`;
             }
         }
-
-        function atualizarCardsMarcacoes() {
-            for (let i = 0; i < 4; i++) {
-                const m = marcacoes[i];
-                if (horaEls[i]) {
-                    horaEls[i].textContent = m.hora || '--:--';
-                }
-                if (localEls[i]) {
-                    if (m.local) {
-                        localEls[i].innerHTML = '<i class="fas fa-map-pin"></i> ' + m.local;
-                    } else {
-                        localEls[i].innerHTML = '<i class="fas fa-map-pin"></i> Aguardando...';
-                    }
-                }
-                if (cards[i]) {
-                    if (m.hora) {
-                        cards[i].classList.add('preenchido');
-                    } else {
-                        cards[i].classList.remove('preenchido');
-                    }
-                }
-            }
-        }
-
+        
+        // Obter localização
         function obterLocalizacao() {
             return new Promise((resolve) => {
                 if (!navigator.geolocation) {
-                    resolve('Geolocalizacao nao suportada');
+                    resolve('Localização não disponível');
                     return;
                 }
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => resolve('Lat ' + pos.coords.latitude.toFixed(5) + ', Lng ' + pos.coords.longitude.toFixed(5)),
-                    (err) => resolve('Localizacao indisponivel'),
+                    (pos) => resolve(`Lat ${pos.coords.latitude.toFixed(5)}, Lng ${pos.coords.longitude.toFixed(5)}`),
+                    () => resolve('Localização indisponível'),
                     { enableHighAccuracy: false, timeout: 6000 }
                 );
             });
         }
-
-async function salvarNoGoogleSheet(acao = 'registrar') {
-    if (!colaboradorSelecionado) return false;
-
-    const dataHoje = new Date();
-    const dataHojeISO = dataHoje.toISOString().split('T')[0];
-
-    const params = new URLSearchParams();
-    params.append('acao', acao);
-    params.append('colaborador', colaboradorSelecionado);
-    params.append('data', dataHojeISO);
-    params.append('marcacao1', marcacoes[0].hora || '');
-    params.append('local1', marcacoes[0].local || '');
-    params.append('marcacao2', marcacoes[1].hora || '');
-    params.append('local2', marcacoes[1].local || '');
-    params.append('marcacao3', marcacoes[2].hora || '');
-    params.append('local3', marcacoes[2].local || '');
-    params.append('marcacao4', marcacoes[3].hora || '');
-    params.append('local4', marcacoes[3].local || '');
-    params.append('tipo_marcacao', proximoIndice.toString());
-    params.append('iso_timestamp', dataHoje.toISOString());
-    params.append('_', Date.now());
-
-    try {
-        const response = await jsonpRequest(params);
-        console.log('✅ Resposta salvar:', response);
-        return true;
-    } catch (error) {
-        console.error('❌ Erro ao salvar:', error);
-        return false;
-    }
-}
-
-async function registrarPonto() {
-    if (!colaboradorSelecionado) {
-        alert('Selecione um colaborador.');
-        return;
-    }
-    
-    if (proximoIndice >= 4) {
-        alert('Todas as marcacoes ja foram feitas.');
-        return;
-    }
-
-    if (btnMarcar) btnMarcar.disabled = true;
-    if (statusText) statusText.textContent = 'Obtendo localizacao...';
-
-    try {
-        const agora = new Date();
-        const horaFormatada = agora.toLocaleTimeString('pt-BR', { 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit' 
-        });
-        const local = await obterLocalizacao();
-
-        marcacoes[proximoIndice] = { hora: horaFormatada, local: local };
         
-        if (statusText) statusText.textContent = 'Salvando na planilha...';
-        
-        // ⬇️ CHAMADA CRÍTICA QUE ESTAVA FALTANDO ⬇️
-        const salvou = await salvarNoGoogleSheet('registrar');
-        
-        if (salvou) {
-            proximoIndice++;
-            atualizarCardsMarcacoes();
+        // Registrar ponto
+        async function registrarPonto() {
+            if (!colaboradorSelecionado || proximoIndice >= 4) return;
             
-            if (statusText) {
-                if (proximoIndice < 4) {
-                    statusText.textContent = 'Marcacao ' + proximoIndice + 'ª registrada!';
-                } else {
-                    statusText.textContent = 'Expediente completo!';
-                }
+            btnPonto.disabled = true;
+            statusTexto.textContent = 'Obtendo localização...';
+            
+            try {
+                const local = await obterLocalizacao();
+                const agora = new Date();
+                const hora = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+                
+                marcacoes[proximoIndice] = {hora: hora, local: local};
+                
+                // Salvar na planilha
+                const dataHoje = agora.toISOString().split('T')[0];
+                const params = new URLSearchParams();
+                params.append('acao', 'registrar');
+                params.append('colaborador', colaboradorSelecionado);
+                params.append('data', dataHoje);
+                params.append('marcacao1', marcacoes[0].hora || '');
+                params.append('local1', marcacoes[0].local || '');
+                params.append('marcacao2', marcacoes[1].hora || '');
+                params.append('local2', marcacoes[1].local || '');
+                params.append('marcacao3', marcacoes[2].hora || '');
+                params.append('local3', marcacoes[2].local || '');
+                params.append('marcacao4', marcacoes[3].hora || '');
+                params.append('local4', marcacoes[3].local || '');
+                params.append('tipo_marcacao', proximoIndice.toString());
+                params.append('_', Date.now());
+                
+                await jsonpRequest(params);
+                
+                proximoIndice++;
+                atualizarCards();
+            } catch (error) {
+                console.error('Erro:', error);
+                statusTexto.textContent = 'Erro ao registrar';
             }
-        } else {
-            if (statusText) statusText.textContent = 'Erro ao salvar. Tente novamente.';
         }
-    } catch (error) {
-        console.error('Erro ao registrar:', error);
-        if (statusText) statusText.textContent = 'Erro ao registrar.';
-    } finally {
-        if (btnMarcar) btnMarcar.disabled = false;
-    }
-}
-
+        
+        // Resetar dia
         async function resetarDia() {
-            if (!confirm('Apagar todas as marcacoes do dia atual?')) return;
+            if (!confirm('Apagar todas as marcações do dia?')) return;
             
-            marcacoes = [
-                { hora: null, local: null },
-                { hora: null, local: null },
-                { hora: null, local: null },
-                { hora: null, local: null }
-            ];
+            marcacoes = [{hora: null}, {hora: null}, {hora: null}, {hora: null}];
             proximoIndice = 0;
-            atualizarCardsMarcacoes();
+            atualizarCards();
             
-            if (statusText) statusText.textContent = 'Dia resetado!';
-        }
-
-        function cadastrarNovoColaborador() {
-            const nome = prompt('Nome do novo colaborador:');
-            if (!nome || nome.trim() === '') return;
-            
-            const nomeLimpo = nome.trim();
-            if (colaboradores.some(c => c.nome.toLowerCase() === nomeLimpo.toLowerCase())) {
-                alert('Colaborador ja cadastrado.');
-                return;
+            try {
+                const dataHoje = new Date().toISOString().split('T')[0];
+                const params = new URLSearchParams();
+                params.append('acao', 'resetar');
+                params.append('colaborador', colaboradorSelecionado);
+                params.append('data', dataHoje);
+                params.append('_', Date.now());
+                await jsonpRequest(params);
+            } catch (error) {
+                console.error('Erro:', error);
             }
-            
-            colaboradores.push({ nome: nomeLimpo });
-            colaboradorSelecionado = nomeLimpo;
-            atualizarSelectColaboradores();
-            
-            if (statusText) statusText.textContent = '"' + nomeLimpo + '" adicionado!';
         }
-
+        
+        // Toggle relatório
         function toggleRelatorio() {
-            if (relatorioSection) {
-                if (relatorioSection.style.display === 'none') {
-                    relatorioSection.style.display = 'block';
-                    if (btnToggleRelatorio) {
-                        btnToggleRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar';
-                    }
-                } else {
-                    relatorioSection.style.display = 'none';
-                    if (btnToggleRelatorio) {
-                        btnToggleRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatorio';
-                    }
-                }
+            if (relatorioArea.style.display === 'none') {
+                relatorioArea.style.display = 'block';
+                btnRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar';
+            } else {
+                relatorioArea.style.display = 'none';
+                btnRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatório';
             }
         }
-
+        
+        // Buscar relatório
         async function buscarRelatorio() {
-            const dataInicio = filtroDataInicio ? filtroDataInicio.value : '';
-            const dataFim = filtroDataFim ? filtroDataFim.value : '';
-            
-            if (!dataInicio || !dataFim) {
-                if (resultadoRelatorio) {
-                    resultadoRelatorio.innerHTML = '<div class="sem-registros">Selecione as datas</div>';
-                }
-                return;
-            }
-
-            if (statusText) statusText.textContent = 'Buscando dados...';
-            
             try {
                 const params = new URLSearchParams();
                 params.append('acao', 'consultar');
-                params.append('dataInicio', dataInicio);
-                params.append('dataFim', dataFim);
-                params.append('colaborador', colaboradorSelecionado || 'todos');
+                params.append('dataInicio', dataInicio.value);
+                params.append('dataFim', dataFim.value);
+                params.append('colaborador', 'todos');
                 params.append('_', Date.now());
                 
                 const response = await jsonpRequest(params);
-                console.log('Resposta relatorio:', response);
                 
                 if (response.status === 'success' && response.registros) {
                     if (response.registros.length === 0) {
-                        if (resultadoRelatorio) {
-                            resultadoRelatorio.innerHTML = '<div class="sem-registros">Nenhum registro encontrado</div>';
-                        }
-                        if (statusText) statusText.textContent = 'Nenhum registro no periodo';
-                    } else {
-                        dadosTabelaAtual = response.registros;
-                        
-                        let html = '<table class="tabela-relatorio"><thead><tr><th>Data</th><th>Colaborador</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead><tbody>';
-                        
-                        dadosTabelaAtual.forEach(reg => {
-                            html += '<tr><td>' + (reg.data || '--') + '</td><td class="colab-nome">' + (reg.colaborador || '--') + '</td>';
-                            html += '<td class="hora-cell">' + (reg.marcacao1 || '--') + '</td>';
-                            html += '<td class="hora-cell">' + (reg.marcacao2 || '--') + '</td>';
-                            html += '<td class="hora-cell">' + (reg.marcacao3 || '--') + '</td>';
-                            html += '<td class="hora-cell">' + (reg.marcacao4 || '--') + '</td></tr>';
-                        });
-                        
-                        html += '</tbody></table>';
-                        
-                        if (resultadoRelatorio) {
-                            resultadoRelatorio.innerHTML = html;
-                        }
-                        if (statusText) statusText.textContent = response.registros.length + ' registros encontrados';
+                        tabelaContainer.innerHTML = '<div class="sem-dados">Nenhum registro encontrado</div>';
+                        return;
                     }
-                } else {
-                    if (resultadoRelatorio) {
-                        resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro ao buscar dados</div>';
-                    }
-                    if (statusText) statusText.textContent = 'Erro na consulta';
+                    
+                    let html = '<table><thead><tr><th>Colaborador</th><th>Data</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead><tbody>';
+                    
+                    response.registros.sort((a, b) => {
+                        const [da, ma, aa] = a.data.split('/');
+                        const [db, mb, ab] = b.data.split('/');
+                        return new Date(ab, mb-1, db) - new Date(aa, ma-1, da);
+                    }).forEach(reg => {
+                        html += `<tr>
+                            <td class="nome-colab">${reg.colaborador || '—'}</td>
+                            <td>${reg.data || '—'}</td>
+                            <td class="hora-cell">${reg.marcacao1 || '—'}</td>
+                            <td class="hora-cell">${reg.marcacao2 || '—'}</td>
+                            <td class="hora-cell">${reg.marcacao3 || '—'}</td>
+                            <td class="hora-cell">${reg.marcacao4 || '—'}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    tabelaContainer.innerHTML = html;
                 }
             } catch (error) {
-                console.error('Erro na consulta:', error);
-                if (resultadoRelatorio) {
-                    resultadoRelatorio.innerHTML = '<div class="sem-registros">Erro de conexao</div>';
-                }
-                if (statusText) statusText.textContent = 'Erro de conexao';
+                console.error('Erro:', error);
+                tabelaContainer.innerHTML = '<div class="sem-dados">Erro ao buscar dados</div>';
             }
         }
-
-        function exportarExcel() {
-            if (dadosTabelaAtual.length === 0) {
+        
+        // Exportar CSV
+        function exportarCSV() {
+            const tabela = tabelaContainer.querySelector('table');
+            if (!tabela) {
                 alert('Nenhum dado para exportar!');
                 return;
             }
             
-            let csv = 'Data,Colaborador,1ª Marcacao,2ª Marcacao,3ª Marcacao,4ª Marcacao\n';
-            dadosTabelaAtual.forEach(reg => {
-                csv += '"' + (reg.data || '') + '","' + (reg.colaborador || '') + '","' + 
-                       (reg.marcacao1 || '') + '","' + (reg.marcacao2 || '') + '","' + 
-                       (reg.marcacao3 || '') + '","' + (reg.marcacao4 || '') + '"\n';
+            let csv = 'Colaborador,Data,1ª Marcação,2ª Marcação,3ª Marcação,4ª Marcação\n';
+            const linhas = tabela.querySelectorAll('tbody tr');
+            
+            linhas.forEach(linha => {
+                const cols = linha.querySelectorAll('td');
+                csv += `"${cols[0].textContent}","${cols[1].textContent}","${cols[2].textContent}","${cols[3].textContent}","${cols[4].textContent}","${cols[5].textContent}"\n`;
             });
             
-            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8;'});
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'ponto_' + new Date().toISOString().slice(0,10) + '.csv';
+            link.download = `ponto_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
-            
-            if (statusText) statusText.textContent = 'Relatorio exportado!';
         }
-
-        async function exportarPNG() {
-            const tabela = document.querySelector('.tabela-relatorio');
-            if (!tabela) {
-                alert('Nenhuma tabela para exportar!');
-                return;
-            }
-            
-            if (statusText) statusText.textContent = 'Gerando imagem...';
-            
-            try {
-                const canvas = await html2canvas(tabela, {
-                    scale: 2,
-                    backgroundColor: '#ffffff'
-                });
-                
-                const link = document.createElement('a');
-                link.download = 'ponto_' + new Date().toISOString().slice(0,10) + '.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                
-                if (statusText) statusText.textContent = 'Imagem exportada!';
-            } catch (err) {
-                console.error('Erro ao exportar PNG:', err);
-                if (statusText) statusText.textContent = 'Erro ao gerar imagem';
+        
+        // Novo colaborador
+        function novoColaborador() {
+            const nome = prompt('Nome do novo colaborador:');
+            if (nome && nome.trim()) {
+                if (!colaboradores.some(c => c.nome.toLowerCase() === nome.trim().toLowerCase())) {
+                    colaboradores.push({nome: nome.trim()});
+                    const opt = document.createElement('option');
+                    opt.value = nome.trim();
+                    opt.textContent = nome.trim();
+                    selectColab.appendChild(opt);
+                    selectColab.value = nome.trim();
+                    colaboradorSelecionado = nome.trim();
+                }
             }
         }
-
-        // Inicializar eventos
-        function inicializar() {
-            console.log('Inicializando eventos...');
-            
-            if (selectColab) {
-                selectColab.addEventListener('change', (e) => {
-                    colaboradorSelecionado = e.target.value;
-                    console.log('Colaborador selecionado:', colaboradorSelecionado);
-                });
-            }
-            
-            if (btnCadastrar) btnCadastrar.addEventListener('click', cadastrarNovoColaborador);
-            if (btnMarcar) btnMarcar.addEventListener('click', registrarPonto);
-            if (btnReset) btnReset.addEventListener('click', resetarDia);
-            if (btnToggleRelatorio) btnToggleRelatorio.addEventListener('click', toggleRelatorio);
-            if (btnFecharRelatorio) btnFecharRelatorio.addEventListener('click', toggleRelatorio);
-            if (btnBuscarRelatorio) btnBuscarRelatorio.addEventListener('click', buscarRelatorio);
-            if (btnExportExcel) btnExportExcel.addEventListener('click', exportarExcel);
-            if (btnExportPNG) btnExportPNG.addEventListener('click', exportarPNG);
-            
-            // Carregar dados iniciais
-            carregarColaboradores();
-            
-            console.log('Sistema inicializado!');
-            if (statusText) statusText.textContent = 'Sistema pronto!';
-        }
-
-        inicializar();
-    })();
-</script>
+        
+        // Event listeners
+        selectColab.addEventListener('change', (e) => {
+            colaboradorSelecionado = e.target.value;
+            carregarMarcacoes();
+        });
+        
+        btnNovo.addEventListener('click', novoColaborador);
+        btnPonto.addEventListener('click', registrarPonto);
+        btnResetar.addEventListener('click', resetarDia);
+        btnRelatorio.addEventListener('click', toggleRelatorio);
+        btnBuscar.addEventListener('click', buscarRelatorio);
+        btnExportar.addEventListener('click', exportarCSV);
+        
+        // Iniciar
+        carregarColaboradores();
+    </script>
 </body>
 </html>
