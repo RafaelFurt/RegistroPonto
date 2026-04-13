@@ -502,6 +502,7 @@
         let colaboradorSelecionado = null;
         let marcacoes = [{hora: null}, {hora: null}, {hora: null}, {hora: null}];
         let proximoIndice = 0;
+        let dadosRelatorio = [];
         
         // Elementos DOM
         const dataSpan = document.getElementById('dataCompleta');
@@ -537,6 +538,98 @@
             document.getElementById('card3'),
             document.getElementById('card4')
         ];
+        
+        // ============================================
+        // FUNÇÃO PARA CONVERTER DATA/HORA DO GOOGLE SHEETS
+        // ============================================
+        function converterDataHoraGoogleSheets(valor) {
+            if (!valor || valor === '') return '';
+            
+            // Se for string e já estiver no formato HH:MM:SS
+            if (typeof valor === 'string' && valor.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return valor;
+            }
+            
+            // Se for string e já estiver no formato DD/MM/YYYY
+            if (typeof valor === 'string' && valor.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                return valor;
+            }
+            
+            // Converter número serial do Excel/Google Sheets
+            let numeroSerial;
+            
+            if (typeof valor === 'number') {
+                numeroSerial = valor;
+            } else if (typeof valor === 'string' && !isNaN(parseFloat(valor))) {
+                numeroSerial = parseFloat(valor);
+            } else {
+                // Tentar parse de data
+                try {
+                    const dt = new Date(valor);
+                    if (!isNaN(dt.getTime())) {
+                        // Verificar se é uma data válida (não 1899)
+                        if (dt.getFullYear() > 1900) {
+                            return dt;
+                        }
+                    }
+                } catch (e) {}
+                return valor;
+            }
+            
+            // Google Sheets/Excel: 1 = 01/01/1900
+            // Ajuste: 25569 = diferença entre 30/12/1899 e 01/01/1970
+            const dataBase = new Date(1899, 11, 30); // 30/12/1899
+            
+            // Converter número serial para milissegundos
+            const dias = Math.floor(numeroSerial);
+            const horasDecimais = (numeroSerial - dias) * 24;
+            const horas = Math.floor(horasDecimais);
+            const minutosDecimais = (horasDecimais - horas) * 60;
+            const minutos = Math.floor(minutosDecimais);
+            const segundos = Math.floor((minutosDecimais - minutos) * 60);
+            
+            // Calcular data
+            const data = new Date(dataBase);
+            data.setDate(dataBase.getDate() + dias);
+            
+            // Formatar
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            const horaStr = String(horas).padStart(2, '0');
+            const minStr = String(minutos).padStart(2, '0');
+            const segStr = String(segundos).padStart(2, '0');
+            
+            return {
+                data: `${dia}/${mes}/${ano}`,
+                hora: `${horaStr}:${minStr}:${segStr}`,
+                dataHora: new Date(ano, data.getMonth(), dia, horas, minutos, segundos)
+            };
+        }
+        
+        function formatarHora(valor) {
+            if (!valor) return '';
+            const convertido = converterDataHoraGoogleSheets(valor);
+            if (typeof convertido === 'object' && convertido.hora) {
+                return convertido.hora;
+            }
+            if (typeof convertido === 'string' && convertido.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return convertido;
+            }
+            return '';
+        }
+        
+        function formatarData(valor) {
+            if (!valor) return '';
+            const convertido = converterDataHoraGoogleSheets(valor);
+            if (typeof convertido === 'object' && convertido.data) {
+                return convertido.data;
+            }
+            if (typeof convertido === 'string' && convertido.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                return convertido;
+            }
+            return '';
+        }
         
         // Inicializar datas
         function atualizarData() {
@@ -643,10 +736,23 @@
                 
                 if (response.status === 'success' && response.registros && response.registros.length > 0) {
                     const reg = response.registros[0];
-                    if (reg.marcacao1) marcacoes[0] = {hora: reg.marcacao1, local: reg.local1};
-                    if (reg.marcacao2) marcacoes[1] = {hora: reg.marcacao2, local: reg.local2};
-                    if (reg.marcacao3) marcacoes[2] = {hora: reg.marcacao3, local: reg.local3};
-                    if (reg.marcacao4) marcacoes[3] = {hora: reg.marcacao4, local: reg.local4};
+                    
+                    if (reg.marcacao1) {
+                        const hora1 = formatarHora(reg.marcacao1);
+                        marcacoes[0] = {hora: hora1, local: reg.local1};
+                    }
+                    if (reg.marcacao2) {
+                        const hora2 = formatarHora(reg.marcacao2);
+                        marcacoes[1] = {hora: hora2, local: reg.local2};
+                    }
+                    if (reg.marcacao3) {
+                        const hora3 = formatarHora(reg.marcacao3);
+                        marcacoes[2] = {hora: hora3, local: reg.local3};
+                    }
+                    if (reg.marcacao4) {
+                        const hora4 = formatarHora(reg.marcacao4);
+                        marcacoes[3] = {hora: hora4, local: reg.local4};
+                    }
                 }
                 
                 // Calcular próximo índice
@@ -785,61 +891,82 @@
         // Buscar relatório
         async function buscarRelatorio() {
             try {
+                statusTexto.textContent = 'Carregando relatório...';
+                
                 const params = new URLSearchParams();
                 params.append('acao', 'consultar');
                 params.append('dataInicio', dataInicio.value);
                 params.append('dataFim', dataFim.value);
                 params.append('colaborador', 'todos');
+                params.append('debug', 'true');
                 params.append('_', Date.now());
                 
                 const response = await jsonpRequest(params);
+                console.log('Resposta relatório:', response);
                 
                 if (response.status === 'success' && response.registros) {
-                    if (response.registros.length === 0) {
+                    dadosRelatorio = response.registros;
+                    
+                    if (dadosRelatorio.length === 0) {
                         tabelaContainer.innerHTML = '<div class="sem-dados">Nenhum registro encontrado</div>';
+                        statusTexto.textContent = 'Nenhum registro no período';
                         return;
                     }
                     
                     let html = '<table><thead><tr><th>Colaborador</th><th>Data</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead><tbody>';
                     
-                    response.registros.sort((a, b) => {
-                        const [da, ma, aa] = a.data.split('/');
-                        const [db, mb, ab] = b.data.split('/');
-                        return new Date(ab, mb-1, db) - new Date(aa, ma-1, da);
+                    // Ordenar por data (mais recente primeiro)
+                    dadosRelatorio.sort((a, b) => {
+                        const dataA = a.data ? a.data.split('/').reverse().join('-') : '';
+                        const dataB = b.data ? b.data.split('/').reverse().join('-') : '';
+                        return dataB.localeCompare(dataA);
                     }).forEach(reg => {
+                        const dataFormatada = reg.data || '—';
+                        const hora1 = formatarHora(reg.marcacao1) || '—';
+                        const hora2 = formatarHora(reg.marcacao2) || '—';
+                        const hora3 = formatarHora(reg.marcacao3) || '—';
+                        const hora4 = formatarHora(reg.marcacao4) || '—';
+                        
                         html += `<tr>
                             <td class="nome-colab">${reg.colaborador || '—'}</td>
-                            <td>${reg.data || '—'}</td>
-                            <td class="hora-cell">${reg.marcacao1 || '—'}</td>
-                            <td class="hora-cell">${reg.marcacao2 || '—'}</td>
-                            <td class="hora-cell">${reg.marcacao3 || '—'}</td>
-                            <td class="hora-cell">${reg.marcacao4 || '—'}</td>
+                            <td>${dataFormatada}</td>
+                            <td class="hora-cell">${hora1}</td>
+                            <td class="hora-cell">${hora2}</td>
+                            <td class="hora-cell">${hora3}</td>
+                            <td class="hora-cell">${hora4}</td>
                         </tr>`;
                     });
                     
                     html += '</tbody></table>';
                     tabelaContainer.innerHTML = html;
+                    statusTexto.textContent = `${dadosRelatorio.length} registros encontrados`;
+                } else {
+                    tabelaContainer.innerHTML = '<div class="sem-dados">Erro ao buscar dados</div>';
+                    statusTexto.textContent = 'Erro na consulta';
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                tabelaContainer.innerHTML = '<div class="sem-dados">Erro ao buscar dados</div>';
+                tabelaContainer.innerHTML = '<div class="sem-dados">Erro de conexão</div>';
+                statusTexto.textContent = 'Erro de conexão';
             }
         }
         
         // Exportar CSV
         function exportarCSV() {
-            const tabela = tabelaContainer.querySelector('table');
-            if (!tabela) {
+            if (!dadosRelatorio || dadosRelatorio.length === 0) {
                 alert('Nenhum dado para exportar!');
                 return;
             }
             
             let csv = 'Colaborador,Data,1ª Marcação,2ª Marcação,3ª Marcação,4ª Marcação\n';
-            const linhas = tabela.querySelectorAll('tbody tr');
             
-            linhas.forEach(linha => {
-                const cols = linha.querySelectorAll('td');
-                csv += `"${cols[0].textContent}","${cols[1].textContent}","${cols[2].textContent}","${cols[3].textContent}","${cols[4].textContent}","${cols[5].textContent}"\n`;
+            dadosRelatorio.forEach(reg => {
+                const hora1 = formatarHora(reg.marcacao1) || '';
+                const hora2 = formatarHora(reg.marcacao2) || '';
+                const hora3 = formatarHora(reg.marcacao3) || '';
+                const hora4 = formatarHora(reg.marcacao4) || '';
+                
+                csv += `"${reg.colaborador || ''}","${reg.data || ''}","${hora1}","${hora2}","${hora3}","${hora4}"\n`;
             });
             
             const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8;'});
@@ -861,6 +988,7 @@
                     selectColab.appendChild(opt);
                     selectColab.value = nome.trim();
                     colaboradorSelecionado = nome.trim();
+                    carregarMarcacoes();
                 }
             }
         }
