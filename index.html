@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- CORRIGIDO: Substituído o meta deprecated -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Ponto.ID">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#6366f1">
     <title>Ponto.ID</title>
@@ -36,16 +38,9 @@
             padding: 20px 16px;
         }
         
-        /* Ajuste para telas muito pequenas (até 360px) */
         @media (max-width: 360px) {
-            body {
-                padding: 4px;
-            }
-            
-            .app {
-                padding: 16px 12px;
-                border-radius: 20px;
-            }
+            body { padding: 4px; }
+            .app { padding: 16px 12px; border-radius: 20px; }
         }
         
         .header {
@@ -55,20 +50,9 @@
             margin-bottom: 20px;
         }
         
-        .header i {
-            font-size: 26px;
-            color: #6366f1;
-        }
-        
-        .header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1e293b;
-        }
-        
-        .header span {
-            color: #6366f1;
-        }
+        .header i { font-size: 26px; color: #6366f1; }
+        .header h1 { font-size: 22px; font-weight: 700; color: #1e293b; }
+        .header span { color: #6366f1; }
         
         .data-card {
             background: #f8fafc;
@@ -87,9 +71,7 @@
             gap: 8px;
         }
         
-        .data-principal i {
-            color: #6366f1;
-        }
+        .data-principal i { color: #6366f1; }
         
         .dia-semana {
             font-size: 13px;
@@ -101,9 +83,7 @@
             margin-top: 8px;
         }
         
-        .colaborador-area {
-            margin-bottom: 20px;
-        }
+        .colaborador-area { margin-bottom: 20px; }
         
         .label {
             font-size: 13px;
@@ -115,9 +95,7 @@
             gap: 6px;
         }
         
-        .label i {
-            color: #6366f1;
-        }
+        .label i { color: #6366f1; }
         
         .seletor-row {
             display: flex;
@@ -142,9 +120,7 @@
             background-size: 14px;
         }
         
-        select:focus {
-            border-color: #6366f1;
-        }
+        select:focus { border-color: #6366f1; }
         
         .btn-novo {
             padding: 12px 16px;
@@ -161,11 +137,8 @@
             white-space: nowrap;
         }
         
-        .btn-novo:active {
-            background: #4f46e5;
-        }
+        .btn-novo:active { background: #4f46e5; }
         
-        /* Grid de marcações responsivo */
         .marcacoes-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -173,12 +146,7 @@
             margin-bottom: 20px;
         }
         
-        /* Em telas menores, manter grid de 2 colunas mas ajustar espaçamentos */
-        @media (max-width: 360px) {
-            .marcacoes-grid {
-                gap: 8px;
-            }
-        }
+        @media (max-width: 360px) { .marcacoes-grid { gap: 8px; } }
         
         .card {
             background: #f8fafc;
@@ -188,12 +156,7 @@
             transition: all 0.2s;
         }
         
-        @media (max-width: 360px) {
-            .card {
-                padding: 12px 8px;
-                border-radius: 14px;
-            }
-        }
+        @media (max-width: 360px) { .card { padding: 12px 8px; border-radius: 14px; } }
         
         .card.preenchido {
             background: #eef2ff;
@@ -212,16 +175,9 @@
             align-items: center;
         }
         
-        @media (max-width: 360px) {
-            .card-titulo {
-                font-size: 10px;
-            }
-        }
+        @media (max-width: 360px) { .card-titulo { font-size: 10px; } }
         
-        .card-titulo i {
-            color: #6366f1;
-            font-size: 12px;
-        }
+        .card-titulo i { color: #6366f1; font-size: 12px; }
         
         .card-hora {
             font-size: 20px;
@@ -230,11 +186,7 @@
             font-feature-settings: "tnum";
         }
         
-        @media (max-width: 360px) {
-            .card-hora {
-                font-size: 18px;
-            }
-        }
+        @media (max-width: 360px) { .card-hora { font-size: 18px; } }
         
         .card-local {
             font-size: 10px;
@@ -246,9 +198,7 @@
             word-break: break-word;
         }
         
-        .card-local i {
-            font-size: 9px;
-        }
+        .card-local i { font-size: 9px; }
         
         .card-desc {
             font-size: 9px;
@@ -260,12 +210,7 @@
             display: inline-block;
         }
         
-        @media (max-width: 360px) {
-            .card-desc {
-                font-size: 8px;
-                padding: 2px 5px;
-            }
-        }
+        @media (max-width: 360px) { .card-desc { font-size: 8px; padding: 2px 5px; } }
         
         .btn-ponto {
             width: 100%;
@@ -286,13 +231,7 @@
             transition: all 0.2s;
         }
         
-        @media (max-width: 360px) {
-            .btn-ponto {
-                padding: 16px;
-                font-size: 16px;
-                border-radius: 16px;
-            }
-        }
+        @media (max-width: 360px) { .btn-ponto { padding: 16px; font-size: 16px; border-radius: 16px; } }
         
         .btn-ponto:active {
             background: #4f46e5;
@@ -327,16 +266,9 @@
             cursor: pointer;
         }
         
-        @media (max-width: 360px) {
-            .btn-acao {
-                padding: 10px 8px;
-                font-size: 12px;
-            }
-        }
+        @media (max-width: 360px) { .btn-acao { padding: 10px 8px; font-size: 12px; } }
         
-        .btn-acao:active {
-            background: #f8fafc;
-        }
+        .btn-acao:active { background: #f8fafc; }
         
         .status {
             padding: 12px 14px;
@@ -349,9 +281,7 @@
             gap: 8px;
         }
         
-        .status i {
-            font-size: 14px;
-        }
+        .status i { font-size: 14px; }
         
         .relatorio-area {
             margin-top: 20px;
@@ -392,13 +322,7 @@
             background: white;
         }
         
-        @media (max-width: 360px) {
-            .filtro-data {
-                min-width: 100px;
-                font-size: 11px;
-                padding: 8px 6px;
-            }
-        }
+        @media (max-width: 360px) { .filtro-data { min-width: 100px; font-size: 11px; padding: 8px 6px; } }
         
         .btn-buscar {
             padding: 10px 16px;
@@ -412,12 +336,7 @@
             white-space: nowrap;
         }
         
-        @media (max-width: 360px) {
-            .btn-buscar {
-                padding: 8px 14px;
-                font-size: 11px;
-            }
-        }
+        @media (max-width: 360px) { .btn-buscar { padding: 8px 14px; font-size: 11px; } }
         
         .tabela-container {
             max-height: 300px;
@@ -430,7 +349,7 @@
         
         table {
             width: 100%;
-            min-width: 480px; /* Permite rolagem horizontal em telas pequenas */
+            min-width: 480px;
             border-collapse: collapse;
             font-size: 12px;
             background: white;
@@ -489,14 +408,12 @@
             color: #94a3b8;
         }
         
-        /* Ajustes de toque para mobile */
         button, select, .btn-acao, .btn-buscar, .btn-exportar {
             touch-action: manipulation;
             -webkit-touch-callout: none;
             user-select: none;
         }
         
-        /* Melhorar scroll em containers */
         .tabela-container {
             scrollbar-width: thin;
             scrollbar-color: #6366f1 #e2e8f0;
@@ -519,7 +436,6 @@
     </style>
 </head>
 <body>
-    <!-- O HTML permanece EXATAMENTE igual ao seu original -->
     <div class="app">
         <div class="header">
             <i class="fas fa-fingerprint"></i>
@@ -615,18 +531,14 @@
     </div>
 
     <script>
-        // O JavaScript permanece EXATAMENTE igual ao seu original
-        // Substitua pela URL do seu Apps Script
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJc1uPUVFUZe4GFhdc8v2qEqR1TQZveuxcSUuYHo6GYcg08xn9JfdchYdzF6Ck3-lh/exec';
         
-        // Estado da aplicação
         let colaboradores = [];
         let colaboradorSelecionado = null;
         let marcacoes = [{hora: null}, {hora: null}, {hora: null}, {hora: null}];
         let proximoIndice = 0;
         let dadosRelatorio = [];
         
-        // Elementos DOM
         const dataSpan = document.getElementById('dataCompleta');
         const diaSemanaSpan = document.getElementById('diaSemana');
         const selectColab = document.getElementById('selectColaborador');
@@ -661,60 +573,39 @@
             document.getElementById('card4')
         ];
         
-        // ============================================
-        // FUNÇÃO SIMPLES PARA FORMATAR HORA (APENAS VISUAL)
-        // ============================================
         function formatarHoraExibicao(valor) {
             if (!valor || valor === '') return '';
-            
-            // Se já for string no formato HH:MM:SS
             if (typeof valor === 'string') {
-                // Se já está no formato correto
-                if (valor.match(/^\d{2}:\d{2}:\d{2}$/)) {
-                    return valor;
-                }
-                // Se for data ISO ou outro formato, tenta extrair a hora
+                if (valor.match(/^\d{2}:\d{2}:\d{2}$/)) return valor;
                 if (valor.includes('T')) {
                     const match = valor.match(/T(\d{2}:\d{2}:\d{2})/);
                     if (match) return match[1];
                 }
-                // Se for data completa do Google Sheets
                 if (valor.includes('GMT') || valor.includes('Dec')) {
                     const match = valor.match(/(\d{2}):(\d{2}):(\d{2})/);
                     if (match) return `${match[1]}:${match[2]}:${match[3]}`;
                 }
                 return valor;
             }
-            
-            // Se for objeto Date
             if (valor instanceof Date) {
                 const h = String(valor.getHours()).padStart(2, '0');
                 const m = String(valor.getMinutes()).padStart(2, '0');
                 const s = String(valor.getSeconds()).padStart(2, '0');
                 return `${h}:${m}:${s}`;
             }
-            
             return String(valor);
         }
         
         function formatarDataExibicao(valor) {
             if (!valor || valor === '') return '';
-            
-            // Se já for string no formato DD/MM/YYYY
-            if (typeof valor === 'string' && valor.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                return valor;
-            }
-            
-            // Se for string no formato YYYY-MM-DD
+            if (typeof valor === 'string' && valor.match(/^\d{2}\/\d{2}\/\d{4}$/)) return valor;
             if (typeof valor === 'string' && valor.match(/^\d{4}-\d{2}-\d{2}$/)) {
                 const [ano, mes, dia] = valor.split('-');
                 return `${dia}/${mes}/${ano}`;
             }
-            
             return String(valor);
         }
         
-        // Inicializar datas
         function atualizarData() {
             const agora = new Date();
             const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
@@ -736,7 +627,6 @@
         atualizarData();
         setInterval(atualizarData, 60000);
         
-        // JSONP Request
         function jsonpRequest(params) {
             return new Promise((resolve, reject) => {
                 const callbackName = 'jsonp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
@@ -771,7 +661,6 @@
             });
         }
         
-        // Carregar colaboradores
         async function carregarColaboradores() {
             try {
                 const params = new URLSearchParams();
@@ -805,7 +694,6 @@
             }
         }
         
-        // Carregar marcações do dia
         async function carregarMarcacoes() {
             if (!colaboradorSelecionado) return;
             
@@ -820,30 +708,18 @@
                 
                 const response = await jsonpRequest(params);
                 
-                // Resetar marcações
                 marcacoes = [{hora: null}, {hora: null}, {hora: null}, {hora: null}];
                 proximoIndice = 0;
                 
                 if (response.status === 'success' && response.registros && response.registros.length > 0) {
                     const reg = response.registros[0];
                     
-                    console.log('Registro encontrado:', reg);
-                    
-                    if (reg.marcacao1) {
-                        marcacoes[0] = {hora: formatarHoraExibicao(reg.marcacao1), local: reg.local1};
-                    }
-                    if (reg.marcacao2) {
-                        marcacoes[1] = {hora: formatarHoraExibicao(reg.marcacao2), local: reg.local2};
-                    }
-                    if (reg.marcacao3) {
-                        marcacoes[2] = {hora: formatarHoraExibicao(reg.marcacao3), local: reg.local3};
-                    }
-                    if (reg.marcacao4) {
-                        marcacoes[3] = {hora: formatarHoraExibicao(reg.marcacao4), local: reg.local4};
-                    }
+                    if (reg.marcacao1) marcacoes[0] = {hora: formatarHoraExibicao(reg.marcacao1), local: reg.local1};
+                    if (reg.marcacao2) marcacoes[1] = {hora: formatarHoraExibicao(reg.marcacao2), local: reg.local2};
+                    if (reg.marcacao3) marcacoes[2] = {hora: formatarHoraExibicao(reg.marcacao3), local: reg.local3};
+                    if (reg.marcacao4) marcacoes[3] = {hora: formatarHoraExibicao(reg.marcacao4), local: reg.local4};
                 }
                 
-                // Calcular próximo índice
                 for (let i = 0; i < 4; i++) {
                     if (!marcacoes[i].hora) {
                         proximoIndice = i;
@@ -870,7 +746,6 @@
                     cards[i].classList.remove('preenchido');
                 }
             }
-            
             atualizarStatus();
         }
         
@@ -888,7 +763,6 @@
             }
         }
         
-        // Obter localização
         function obterLocalizacao() {
             return new Promise((resolve) => {
                 if (!navigator.geolocation) {
@@ -903,7 +777,6 @@
             });
         }
         
-        // Registrar ponto
         async function registrarPonto() {
             if (!colaboradorSelecionado || proximoIndice >= 4) return;
             
@@ -917,7 +790,6 @@
                 
                 marcacoes[proximoIndice] = {hora: hora, local: local};
                 
-                // Salvar na planilha
                 const dataHoje = agora.toISOString().split('T')[0];
                 const params = new URLSearchParams();
                 params.append('acao', 'registrar');
@@ -944,7 +816,6 @@
             }
         }
         
-        // Resetar dia
         async function resetarDia() {
             if (!confirm('Apagar todas as marcações do dia?')) return;
             
@@ -965,19 +836,17 @@
             }
         }
         
-        // Toggle relatório
         function toggleRelatorio() {
             if (relatorioArea.style.display === 'none') {
                 relatorioArea.style.display = 'block';
                 btnRelatorio.innerHTML = '<i class="fas fa-times"></i> Fechar';
-                buscarRelatorio(); // 🔥 BUSCAR AUTOMATICAMENTE AO ABRIR
+                buscarRelatorio();
             } else {
                 relatorioArea.style.display = 'none';
                 btnRelatorio.innerHTML = '<i class="fas fa-chart-bar"></i> Relatório';
             }
         }
         
-        // Buscar relatório
         async function buscarRelatorio() {
             try {
                 statusTexto.textContent = 'Carregando relatório...';
@@ -985,18 +854,14 @@
                 const dataInicioVal = dataInicio.value;
                 const dataFimVal = dataFim.value;
         
-                console.log('🔍 DATAS DO FILTRO:', dataInicioVal, 'até', dataFimVal);
-        
                 const params = new URLSearchParams();
                 params.append('acao', 'consultar');
                 params.append('dataInicio', dataInicioVal);
                 params.append('dataFim', dataFimVal);
                 params.append('colaborador', 'todos');
-                params.append('debug', 'true'); // 👈 Adicionar debug
                 params.append('_', Date.now());
                 
                 const response = await jsonpRequest(params);
-                console.log('Resposta relatório:', response);
                 
                 if (response.status === 'success' && response.registros) {
                     dadosRelatorio = response.registros;
@@ -1009,7 +874,6 @@
                     
                     let html = '<table><thead><tr><th>Colaborador</th><th>Data</th><th>1ª</th><th>2ª</th><th>3ª</th><th>4ª</th></tr></thead><tbody>';
                     
-                    // Ordenar por data (mais recente primeiro)
                     dadosRelatorio.sort((a, b) => {
                         const dataA = a.data ? a.data.split('/').reverse().join('-') : '';
                         const dataB = b.data ? b.data.split('/').reverse().join('-') : '';
@@ -1045,7 +909,6 @@
             }
         }
         
-        // Exportar CSV
         function exportarCSV() {
             if (!dadosRelatorio || dadosRelatorio.length === 0) {
                 alert('Nenhum dado para exportar!');
@@ -1070,7 +933,6 @@
             link.click();
         }
         
-        // Novo colaborador
         function novoColaborador() {
             const nome = prompt('Nome do novo colaborador:');
             if (nome && nome.trim()) {
@@ -1087,7 +949,6 @@
             }
         }
         
-        // Event listeners
         selectColab.addEventListener('change', (e) => {
             colaboradorSelecionado = e.target.value;
             carregarMarcacoes();
@@ -1100,7 +961,6 @@
         btnBuscar.addEventListener('click', buscarRelatorio);
         btnExportar.addEventListener('click', exportarCSV);
         
-        // Iniciar
         carregarColaboradores();
     </script>
 </body>
